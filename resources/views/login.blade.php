@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Monitoring Tower</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('layouts.admin')
+
+@section('content')
 <body class="bg-gradient-to-br from-blue-100 via-white to-blue-200 min-h-screen flex items-center justify-center font-sans">
 
     <div class="bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row w-[900px] max-w-4xl">
@@ -61,6 +56,5 @@
             </p>
         </div>
     </div>
-
 </body>
-</html>
+@endsection
