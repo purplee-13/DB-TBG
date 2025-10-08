@@ -31,7 +31,10 @@
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">TOTAL</h3>
                 <p class="text-4xl font-bold text-black-600">500</p>
-                <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
+                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                </div>
             </div>
         </div>
         
@@ -41,7 +44,10 @@
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">350</p>
-                <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
+                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                </div>
             </div>
         </div>
 
@@ -51,7 +57,10 @@
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">150</p>
-                <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
+                    <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
+                </div>
             </div>
         </div>
         

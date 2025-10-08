@@ -9,8 +9,7 @@
 
     <ul class="flex gap-6 text-gray-700 font-medium">
         <li><a href="#" class="hover:text-[#022CB8]">Dashboard</a></li>
-        <li><a href="#" class="hover:text-[#022CB8]">Data Site</a></li>
-        <li><a href="#" class="hover:text-[#022CB8]">Update Maintenance</a></li>
+        <li><a href="#" class="hover:text-[#022CB8]">kelola Pengguna</a></li>
     </ul>
 
     <div class="flex items-center gap-2">
