@@ -1,45 +1,58 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h2 class="text-3xl font-bold mb-4">Selamat Datang, INGRID!</h2>
-
-    {{-- Kartu Statistik --}}
-    <div class="grid grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-4 rounded-xl shadow text-center">
-            <h3 class="text-gray-700 font-semibold">TOTAL</h3>
-            <p class="text-4xl font-bold text-red-600">500</p>
-            <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl shadow text-center">
-            <h3 class="text-gray-700 font-semibold">SUDAH VISIT</h3>
-            <p class="text-4xl font-bold text-blue-600">500</p>
-            <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl shadow text-center">
-            <h3 class="text-gray-700 font-semibold">BELUM VISIT</h3>
-            <p class="text-4xl font-bold text-gray-700">500</p>
-            <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl shadow text-center">
-            <h3 class="text-gray-700 font-semibold">% Persentase</h3>
-            <p class="text-4xl font-bold text-red-600">0.2%</p>
-            <p class="text-gray-500 text-sm">telah visit dari total Sites</p>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-3xl font-bold">Selamat Datang, FIRA!</h2>
+        {{-- Filter Dropdown --}}
+        <div class="flex gap-4">
+            <select class="border rounded-lg px-3 py-2">
+                <option>Service Area</option>
+                <option>SA Luwu Utara</option>
+            </select>
+            <select class="border rounded-lg px-3 py-2">
+                <option>STO</option>
+                <option>MAS</option>
+            </select>
         </div>
     </div>
 
-    {{-- Filter Dropdown --}}
-    <div class="flex gap-4 mb-6">
-        <select class="border rounded-lg px-3 py-2">
-            <option>Service Area</option>
-            <option>SA Luwu Utara</option>
-        </select>
-        <select class="border rounded-lg px-3 py-2">
-            <option>STO</option>
-            <option>MAS</option>
-        </select>
+    {{-- Kartu Statistik --}}
+    <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="flex items-center justify-center bg-white p-4 rounded-xl shadow gap-4">
+                <img src="{{ asset('assets/icon/tower.png') }}" alt="Terverifikasi" class="w-24 h-24">
+                <div class="text-left">
+                    <h3 class="text-[#022CB8] font-semibold">TOTAL</h3>
+                    <p class="text-4xl font-bold text-black-600">500</p>
+                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                </div>
+            </div>
+        
+        <div class="flex items-center justify-center bg-white p-4 rounded-xl shadow gap-4">
+                <img src="{{ asset('assets/icon/visit.png') }}" alt="Sudah Visit" class="w-24 h-24">
+                <div class="text-left">
+                    <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
+                    <p class="text-4xl font-bold text-black-600">350</p>
+                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                </div>
+            </div>
+
+        <div class="flex items-center justify-center bg-white p-4 rounded-xl shadow gap-4">
+                <img src="{{ asset('assets/icon/visitno.png') }}" alt="Belum Visit" class="w-24 h-24">
+                <div class="text-left">
+                    <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
+                    <p class="text-4xl font-bold text-black-600">150</p>
+                    <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
+                </div>
+            </div>
+        
+        <div class="flex items-center justify-center bg-white p-4 rounded-xl shadow gap-4">
+                <img src="{{ asset('assets/icon/persen.png') }}" alt="Persentase" class="w-24 h-24">
+                <div class="text-left">
+                    <h3 class="text-[#022CB8] font-semibold">Persentase</h3>
+                    <p class="text-4xl font-bold text-black-600">0.2%</p>
+                    <p class="text-gray-500 text-sm">telah visit dari total Sites</p>
+                </div>
+            </div>
     </div>
 
     {{-- Grafik dan Pie --}}

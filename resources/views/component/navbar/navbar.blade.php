@@ -3,7 +3,7 @@
         <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10">
         <div>
         <h1 class="text-xl font-semibold text-gray-700">TOWER BERSAMA GROUP</h1>
-            <p class="text-sm text-gray-500">Sel, 7 Oktober 2025, <span id="current-time"></span></p>
+            <span class="material-symbols-outlined">calendar_clock</span><p class="text-sm text-gray-500">Sel, 7 Oktober 2025, <span id="current-time"></span></p>
         </div>
     </div>
 
