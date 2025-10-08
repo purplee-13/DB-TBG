@@ -1,7 +1,6 @@
 <nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between">
-    {{-- Kiri: Logo + Nama + Tanggal/Jam --}}
     <div class="flex items-center gap-3">
-        <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10">
+        <div><a href="{{ url('/') }}"><img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10"></a></div>
         <div class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-[#022CB8]">calendar_clock</span>
                 <p class="text-sm text-[#022CB8]">Sel, 7 Oktober 2025, <span id="current-time"></span></p>
