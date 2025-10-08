@@ -45,7 +45,7 @@
                 <p class="text-4xl font-bold text-black-600">350</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
-                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                    <p class="text-green-500 text-sm">+1 dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
                 <p class="text-4xl font-bold text-black-600">150</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
-                    <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
+                    <p class="text-red-500 text-sm">-19 dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -79,18 +79,18 @@
                 </div>
 
                 {{-- Right Side: Area & STO Info --}}
-                <div class="flex flex-col gap-4 bg-[#5E6784] p-2 rounded-lg">
+                <div class="flex flex-col gap-4 bg-[#5E6784] p-2 rounded-lg items-center justify-center">
                     {{-- Service Area Stats --}}
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 text-center">
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl font-bold text-white">6</p>
+                            <p class="text-3xl text- font-bold text-white">6</p>
                         </div>
                     </div>
                     
                     {{-- STO Stats --}}
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 text-center">
                         <img src="{{ asset('assets/icon/sto.png') }}" alt="STO" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">STO</h3>
