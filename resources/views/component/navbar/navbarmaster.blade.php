@@ -1,5 +1,4 @@
 <nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between">
-    {{-- Kiri: Logo + Nama + Tanggal/Jam --}}
     <div class="flex items-center gap-3">
         <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10">
         <div class="flex items-center gap-1">
@@ -8,14 +7,11 @@
             </div>
     </div>
 
-    {{-- Tengah: Menu --}}
     <ul class="flex gap-6 text-gray-700 font-medium">
-        <li><a href="{{ url('/') }}" class="hover:text-blue-600">Dashboard</a></li>
-        <li><a href="{{ url('/datasite') }}" class="hover:text-blue-600">Data Site</a></li>
-        <li><a href="{{ url('/update-maintenance') }}" class="hover:text-blue-600">Update Maintenance</a></li>
+        <li><a href="#" class="hover:text-[#022CB8]">Dashboard</a></li>
+        <li><a href="#" class="hover:text-[#022CB8]">kelola Pengguna</a></li>
     </ul>
 
-    {{-- Kanan: Profil --}}
     <div class="flex items-center gap-2">
         <span class="text-black-600 font-medium">Dea Binti Ingrid</span>
         <div class="bg-black rounded-full w-8 h-8 flex items-center justify-center">
@@ -24,7 +20,6 @@
     </div>
 </nav>
 
-{{-- Script Jam --}}
 <script>
     function updateClock() {
         const now = new Date();

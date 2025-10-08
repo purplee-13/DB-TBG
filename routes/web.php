@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome'); // arahkan ke dashboard.blade.php
+    return view('dashboard');
 });
 
 Route::get('/datasite', function () {
