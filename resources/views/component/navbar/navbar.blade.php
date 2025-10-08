@@ -3,7 +3,7 @@
         <div><a href="{{ url('/') }}"><img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10"></a></div>
         <div class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-[#022CB8]">calendar_clock</span>
-                <p class="text-sm text-[#022CB8]">Sel, 7 Oktober 2025, <span id="current-time"></span></p>
+                <p class="text-sm text-[#022CB8]"><span id="current-date"></span>, <span id="current-time"></span></p>
             </div>
     </div>
 
@@ -25,17 +25,31 @@
 
 {{-- Script Jam --}}
 <script>
-    function updateClock() {
+    function updateDateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('id-ID', {
+        const witaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Makassar' }));
+        
+        // Format date
+        const dateOptions = { 
+            weekday: 'short', 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric'
+        };
+        const dateString = witaTime.toLocaleDateString('id-ID', dateOptions);
+        
+        // Format time
+        const timeString = witaTime.toLocaleTimeString('id-ID', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Makassar'
+            hour12: false
         });
+
+        document.getElementById("current-date").textContent = dateString;
         document.getElementById("current-time").textContent = timeString;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 </script>

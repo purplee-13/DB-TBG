@@ -3,7 +3,6 @@
 @section('content')
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, FIRA!</h2>
-        {{-- Filter Dropdown --}}
         <div class="flex gap-4">
             <select class="border rounded-lg px-3 py-2">
                 <option>Service Area</option>
