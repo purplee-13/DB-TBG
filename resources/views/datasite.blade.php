@@ -6,12 +6,12 @@
     {{-- =================== SEARCH & ADD =================== --}}
     <div class="flex justify-end items-center mb-4 gap-3">
         <div class="relative">
-            <input type="text" placeholder="Cari"
+            <input type="text" id="searchInput" placeholder="Cari"
                 class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300">
             <span class="absolute left-3 top-2.5 text-gray-500">
                 <i class="fas fa-search"></i>
             </span>
-            <button class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+            <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -24,7 +24,7 @@
 
     {{-- =================== TABLE =================== --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="min-w-full text-sm" id="sitesTable">
             <thead class="bg-blue-600 text-white">
                 <tr>
                     <th class="py-3 px-4 text-left">NO</th>
@@ -37,7 +37,7 @@
                     <th class="py-3 px-4 text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody id="tableBody" class="divide-y">
                 @php
                     $sites = [
                         ['id' => '2814082004','name'=>'Site Name IBS Tanete_Rilau','area'=>'SA PAREPARE','sto'=>'BAR','product'=>'MMP (Fiberization)','tikor'=>'-4.26268, 119.63047'],
@@ -47,7 +47,7 @@
                 @endphp
 
                 @foreach ($sites as $index => $site)
-                    <tr class="hover:bg-gray-100">
+                    <tr>
                         <td class="py-2 px-4">{{ $index + 1 }}</td>
                         <td class="py-2 px-4">{{ $site['id'] }}</td>
                         <td class="py-2 px-4">{{ $site['name'] }}</td>
@@ -55,17 +55,9 @@
                         <td class="py-2 px-4">{{ $site['sto'] }}</td>
                         <td class="py-2 px-4">{{ $site['product'] }}</td>
                         <td class="py-2 px-4">{{ $site['tikor'] }}</td>
-                        <td class="py-2 px-4 text-center">
-                            {{-- Tombol Edit --}}
-                            <button class="text-blue-600 hover:text-blue-800 mr-3" 
-                                    title="Edit"
-                                    onclick="openEditModal('{{ $site['id'] }}','{{ $site['name'] }}','{{ $site['area'] }}','{{ $site['sto'] }}','{{ $site['product'] }}','{{ $site['tikor'] }}')">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            {{-- Tombol Hapus --}}
-                            <button class="text-red-600 hover:text-red-800" title="Hapus">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <td class="py-2 px-4 text-center flex justify-center gap-3">
+                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit"><i class="fas fa-pen"></i></button>
+                            <button class="text-red-600 hover:text-red-800 delete-btn" title="Hapus"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 @endforeach
@@ -73,22 +65,23 @@
         </table>
     </div>
 
-    {{-- =================== MODAL TAMBAH =================== --}}
+    {{-- Modal Tambah/Edit Site --}}
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
-            <h2 class="text-xl font-bold mb-4">Tambah Site</h2>
-            <form>
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Site</h2>
+            <form id="siteForm">
+                <input type="hidden" id="editIndex">
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site ID</label>
-                    <input type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="siteId" class="w-full border rounded-lg px-3 py-2">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Name</label>
-                    <input type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="siteName" class="w-full border rounded-lg px-3 py-2">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Service Area</label>
-                    <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <select id="siteArea" class="w-full border rounded-lg px-3 py-2">
                         <option>Pilih Service Area</option>
                         <option>SA PAREPARE</option>
                         <option>SA PALOPO</option>
@@ -98,7 +91,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">STO</label>
-                    <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <select id="siteSTO" class="w-full border rounded-lg px-3 py-2">
                         <option>Pilih STO</option>
                         <option>BAR</option>
                         <option>BLP</option>
@@ -126,12 +119,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
-                    <input type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="siteProduct" class="w-full border rounded-lg px-3 py-2">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Tikor</label>
-                    <input type="text" placeholder="-4.12345, 120.67890"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="siteTikor" placeholder="-4.12345, 120.67890"
+                        class="w-full border rounded-lg px-3 py-2">
                 </div>
 
                 <div class="flex justify-end gap-3 mt-4">
@@ -222,31 +215,90 @@
 
 </div>
 
-{{-- =================== SCRIPT =================== --}}
 <script>
-    // Modal Tambah
-    function openAddModal() {
+    let sites = @json($sites);
+
+    function openModal(editIndex = null) {
         document.getElementById('addModal').classList.remove('hidden');
         document.getElementById('addModal').classList.add('flex');
+
+        if (editIndex !== null) {
+            document.getElementById('modalTitle').innerText = "Edit Site";
+            document.getElementById('editIndex').value = editIndex;
+            const site = sites[editIndex];
+            document.getElementById('siteId').value = site.id;
+            document.getElementById('siteName').value = site.name;
+            document.getElementById('siteArea').value = site.area;
+            document.getElementById('siteSTO').value = site.sto;
+            document.getElementById('siteProduct').value = site.product;
+            document.getElementById('siteTikor').value = site.tikor;
+        } else {
+            document.getElementById('modalTitle').innerText = "Tambah Site";
+            document.getElementById('editIndex').value = "";
+            document.getElementById('siteForm').reset();
+        }
     }
-    function closeAddModal() {
+
+    function closeModal() {
         document.getElementById('addModal').classList.add('hidden');
     }
 
-    // Modal Edit
-    function openEditModal(id, name, area, sto, product, tikor) {
-        document.getElementById('editSiteID').value = id;
-        document.getElementById('editSiteName').value = name;
-        document.getElementById('editServiceArea').value = area;
-        document.getElementById('editSTO').value = sto;
-        document.getElementById('editProduct').value = product;
-        document.getElementById('editTikor').value = tikor;
+    document.getElementById('siteForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        document.getElementById('editModal').classList.remove('hidden');
-        document.getElementById('editModal').classList.add('flex');
+        const id = document.getElementById('siteId').value;
+        const name = document.getElementById('siteName').value;
+        const area = document.getElementById('siteArea').value;
+        const sto = document.getElementById('siteSTO').value;
+        const product = document.getElementById('siteProduct').value;
+        const tikor = document.getElementById('siteTikor').value;
+        const editIndex = document.getElementById('editIndex').value;
+
+        if (editIndex) {
+            // Edit
+            sites[editIndex] = {id, name, area, sto, product, tikor};
+        } else {
+            // Tambah
+            sites.push({id, name, area, sto, product, tikor});
+        }
+
+        renderTable();
+        closeModal();
+    });
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        sites.forEach((site, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="py-2 px-4">${index + 1}</td>
+                <td class="py-2 px-4">${site.id}</td>
+                <td class="py-2 px-4">${site.name}</td>
+                <td class="py-2 px-4">${site.area}</td>
+                <td class="py-2 px-4">${site.sto}</td>
+                <td class="py-2 px-4">${site.product}</td>
+                <td class="py-2 px-4">${site.tikor}</td>
+                <td class="py-2 px-4 text-center flex justify-center gap-3">
+                    <button class="text-blue-600 hover:text-blue-800 edit-btn" onclick="openModal(${index})"><i class="fas fa-pen"></i></button>
+                    <button class="text-red-600 hover:text-red-800 delete-btn" onclick="deleteRow(${index})"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
-    function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
+
+    function deleteRow(index) {
+        if (confirm("Yakin ingin menghapus data ini?")) {
+            sites.splice(index, 1);
+            renderTable();
+        }
     }
+
+    function clearSearch() {
+        document.getElementById('searchInput').value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", renderTable);
 </script>
 @endsection

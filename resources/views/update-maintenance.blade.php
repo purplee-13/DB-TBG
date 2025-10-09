@@ -66,7 +66,7 @@
                         <td class="py-2 px-4">{{ $m['ket'] }}</td>
                         <td class="py-2 px-4 text-center">
                             <button 
-                                class="text-blue-600 hover:text-blue-800 edit-btn"
+                                class="text- blue-600 hover:text-blue-800 edit-btn"
                                 data-id="{{ $m['id'] }}"
                                 data-name="{{ $m['name'] }}"
                                 data-teknisi="{{ $m['teknisi'] }}"
