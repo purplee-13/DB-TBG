@@ -31,6 +31,15 @@
     <div class="w-1/2 flex flex-col items-center justify-center px-10 text-gray-700">
       <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-40 mb-5">
       <p class="text-sm text-gray-500 mb-6 text-center">Silahkan login menggunakan Username & Password anda!</p>
+      @if($errors->any())
+            <div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
       <form method="POST" action="{{ route('login.post') }}" class="w-full max-w-sm">
         @csrf
@@ -52,12 +61,6 @@
         <button type="submit" class="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-md transition">
           Login
         </button>
-
-        @if ($errors->has('login'))
-          <div class="text-red-600 text-sm mt-3 text-center">
-            {{ $errors->first('login') }}
-          </div>
-        @endif
       </form>
     </div>
   </div>

@@ -20,7 +20,20 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required',
-            'password' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:20',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&_]/',
+            ],
+        ], [
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 20 karakter',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
         ]);
 
         // Cari user berdasarkan username

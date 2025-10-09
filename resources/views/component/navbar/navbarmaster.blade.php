@@ -8,8 +8,8 @@
     </div>
 
     <ul class="flex gap-6 text-gray-700 font-medium">
-        <li><a href="#" class="hover:text-[#022CB8]">Dashboard</a></li>
-        <li><a href="#" class="hover:text-[#022CB8]">kelola Pengguna</a></li>
+        <li><a href="#" class="{{ request()->is('dashboard') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Dashboard</a></li>
+        <li><a href="#" class="{{ request()->is('user-management') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Kelola Pengguna</a></li>
     </ul>
 
     <div class="flex items-center gap-2">

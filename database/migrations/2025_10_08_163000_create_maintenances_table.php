@@ -11,12 +11,11 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('site_id')->constrained('sites')->onDelete('cascade');
-            $table->string('technician')->nullable();
-            $table->text('description')->nullable();
-            $table->date('visit_date')->nullable();
-            $table->string('status')->default('Pending');
+            $table->string('teknisi')->nullable();
+            $table->text('keterangan')->nullable();
+            $table->date('tngl_visit')->nullable();
+            $table->enum('progres', ['Pending', 'In Progress', 'Completed'])->default('Pending');
             $table->string('operator')->nullable();
-            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

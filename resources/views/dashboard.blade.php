@@ -248,30 +248,63 @@
         });
 
         // Pie chart INTERSITE FO
+                // Replace the existing pieChart1 configuration with:
         new Chart(document.getElementById('pieChart1'), {
             type: 'pie',
             data: {
                 labels: ['Belum Visit', 'Visit'],
-                datasets: [{ data: [75, 25], backgroundColor: ['#ef4444', '#22c55e'] }]
+                datasets: [{
+                    data: [75, 25],
+                    backgroundColor: ['#ef4444', '#22c55e']
+                }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { position: 'bottom' },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    const dataset = data.datasets[0];
+                                    const total = dataset.data.reduce((a,b) => a+b, 0);
+                                    return data.labels.map((label, i) => {
+                                        const value = dataset.data[i];
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `<span class="material-symbols-outlined" style="color: ${dataset.backgroundColor[i]}">
+                                                    ${label === 'Visit' ? 'where_to_vote' : 'location_off'}
+                                                  </span> ${label} (${value}) - ${percentage}%`,
+                                            fillStyle: dataset.backgroundColor[i],
+                                            hidden: isNaN(dataset.data[i]),
+                                            index: i,
+                                            textAlign: 'left'
+                                        };
+                                    });
+                                }
+                                return [];
+                            },
+                            font: {
+                                family: "'Inter', sans-serif"
+                            },
+                            padding: 20,
+                            useHTML: true
+                        }
+                    },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                let value = context.raw;
-                                let total = context.dataset.data.reduce((a,b) => a+b, 0);
-                                let percentage = ((value / total) * 100).toFixed(2);
-                                return `${context.label}: ${percentage}% (${value})`;
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a,b) => a+b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${context.label}: ${value} (${percentage}%)`;
                             }
                         }
                     }
                 }
             }
         });
-
         // Pie chart MMP
         new Chart(document.getElementById('pieChart2'), {
             type: 'pie',
