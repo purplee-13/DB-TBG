@@ -83,38 +83,15 @@
                     <label class="block text-sm font-medium">Service Area</label>
                     <select id="siteArea" class="w-full border rounded-lg px-3 py-2">
                         <option>Pilih Service Area</option>
-                        <option>SA PAREPARE</option>
-                        <option>SA PALOPO</option>
-                        <option>SA MAJENE</option>
-                        <option>SA PINRANG</option>
+                        @foreach(array_keys(config('sto')) as $area)
+                            <option value="{{ $area }}">{{ $area }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">STO</label>
                     <select id="siteSTO" class="w-full border rounded-lg px-3 py-2">
-                        <option>Pilih STO</option>
-                        <option>BAR</option>
-                        <option>BLP</option>
-                        <option>ENR</option>
-                        <option>MAJ</option>
-                        <option>MAK</option>
-                        <option>MAM</option>
-                        <option>MAS</option>
-                        <option>MLL</option>
-                        <option>MMS</option>
-                        <option>PIN</option>
-                        <option>PKA</option>
-                        <option>PLP</option>
-                        <option>PLW</option>
-                        <option>PRE</option>
-                        <option>RTP</option>
-                        <option>SID</option>
-                        <option>SIW</option>
-                        <option>SKG</option>
-                        <option>TMN</option>
-                        <option>TPY</option>
-                        <option>TTE</option>
-                        <option>WTG</option>
+                        <option value="">Pilih STO</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -229,7 +206,11 @@
             document.getElementById('siteId').value = site.id;
             document.getElementById('siteName').value = site.name;
             document.getElementById('siteArea').value = site.area;
-            document.getElementById('siteSTO').value = site.sto;
+            const areaSelect = document.getElementById('siteArea');
+            areaSelect.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+                document.getElementById('siteSTO').value = site.sto;
+            }, 100);
             document.getElementById('siteProduct').value = site.product;
             document.getElementById('siteTikor').value = site.tikor;
         } else {
@@ -298,6 +279,40 @@
     function clearSearch() {
         document.getElementById('searchInput').value = "";
     }
+
+    const stoData = @json(config('sto'));
+
+    document.getElementById('siteArea').addEventListener('change', function() {
+        const area = this.value;
+        const stoSelect = document.getElementById('siteSTO');
+        stoSelect.innerHTML = '<option value="">-- Pilih STO --</option>';
+
+        if (stoData[area]) {
+            stoData[area].forEach(sto => {
+                const opt = document.createElement('option');
+                opt.value = sto;
+                opt.textContent = sto;
+                stoSelect.appendChild(opt);
+            });
+        }
+    });
+
+    document.getElementById('siteSTO').addEventListener('change', function() {
+        const area = this.value;
+        const stoSelect = document.getElementById('siteSTO');
+        stoSelect.innerHTML = '<option value="">Pilih STO</option>';
+
+        const stoData = @json(config('sto'));
+        
+        if (stoData[area]) {
+            Object.entries(stoData[area]).forEach(([code, name]) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = `${code} - ${name}`;
+                stoSelect.appendChild(option);
+            });
+        }
+    });
 
     document.addEventListener("DOMContentLoaded", renderTable);
 </script>

@@ -51,8 +51,9 @@ class Controller extends BaseController
             return redirect()->route('login');
         }
 
+        $stoData = config('sto');
         $sites = Site::all();
-        return view('datasite', compact('sites'));
+        return view('datasite', compact('sites', 'stoData'));
     }
 
     // 🟢 Update Maintenance

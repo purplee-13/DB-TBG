@@ -41,7 +41,7 @@
                 <p class="text-4xl font-bold text-black-600">350</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
-                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                    <p class="text-green-500 text-sm">+1 dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 <p class="text-4xl font-bold text-black-600">150</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
-                    <p class="text-red-500 text-sm">-19 dari bulan lalu</p>
+                    <p class="text-red-500 text-sm">-19 dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -68,15 +68,20 @@
                         <p class="text-gray-500 text-sm">telah visit dari total Sites</p>
                     </div>
                 </div>
-                <div class="flex flex-col gap-4 bg-[#5E6784] p-2 rounded-lg">
-                    <div class="flex items-center gap-2">
+
+                {{-- Right Side: Area & STO Info --}}
+                <div class="flex flex-col gap-4 bg-[#5E6784] p-2 rounded-lg items-center justify-center">
+                    {{-- Service Area Stats --}}
+                    <div class="flex items-center gap-2 text-center">
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl font-bold text-white">6</p>
+                            <p class="text-3xl text- font-bold text-white">6</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
+                    
+                    {{-- STO Stats --}}
+                    <div class="flex items-center gap-2 text-center">
                         <img src="{{ asset('assets/icon/sto.png') }}" alt="STO" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">STO</h3>
@@ -123,25 +128,63 @@
                         <th class="border px-3 py-2">%</th>
                         <th class="border px-3 py-2">Keterangan</th>
                     </tr>
+                    <tr class="bg-gray-100 font-semibold text-gray-700">
+                        <th colspan="4"></th>
+                        <th class="border px-2 py-1">IN FO</th>
+                        <th class="border px-2 py-1">MMP</th>
+                        <th class="border px-2 py-1">ALL</th>
+                        <th class="border px-2 py-1">IN FO</th>
+                        <th class="border px-2 py-1">MMP</th>
+                        <th class="border px-2 py-1">ALL</th>
+                        <th class="border px-2 py-1">IN FO</th>
+                        <th class="border px-2 py-1">MMP</th>
+                        <th class="border px-2 py-1">ALL</th>
+                        <th colspan="2"></th>
+                    </tr>
                 </thead>
                 <tbody>
-                    <tr class="hover:bg-gray-50">
-                        <td class="border px-2 py-1 text-left">SA LUWU UTARA</td>
-                        <td class="border px-2 py-1">MAS</td>
-                        <td class="border px-2 py-1">4</td>
-                        <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">6</td>
-                        <td class="border px-2 py-1 bg-red-100 text-red-700">44</td>
-                        <td class="border px-2 py-1 bg-red-100 text-red-700">5</td>
-                        <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">49</td>
-                        <td class="border px-2 py-1 bg-green-100 text-green-800">11</td>
-                        <td class="border px-2 py-1 bg-green-100 text-green-800">3</td>
-                        <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">14</td>
-                        <td class="border px-2 py-1 bg-gray-100">55</td>
-                        <td class="border px-2 py-1 bg-gray-100">8</td>
-                        <td class="border px-2 py-1 bg-gray-200 font-semibold">63</td>
-                        <td class="border px-2 py-1 font-bold bg-green-100 text-green-700">27,27%</td>
-                        <td class="border px-2 py-1 text-gray-700">Belum Terassign</td>
-                    </tr>
+                    @php
+                        $data = [
+                            ['SA LUWU UTARA','MAS',4,2,[35,5,40],[14,1,15],[49,6,55],'27,27%','Belum Terassign'],
+                            ['SA LUWU UTARA','MLL',1,0,[9,2,11],[0,0,0],[9,2,11],'0,00%','Belum Terassign'],
+                            ['SA LUWU UTARA','TMN',2,1,[13,3,16],[11,0,11],[24,3,27],'40,74%','Belum Terassign'],
+                            ['SA MAJENE','MAJ',1,4,[5,3,8],[4,0,4],[9,3,12],'33,33%','Belum Terassign'],
+                            ['SA MAJENE','MMS',1,0,[1,0,1],[0,0,0],[1,0,1],'0,00%','Belum Terassign'],
+                            ['SA MAJENE','PLW',2,1,[22,2,24],[4,2,6],[26,4,30],'20,00%','Belum Terassign'],
+                        ];
+                    @endphp
+
+                    @foreach($data as $row)
+                        <tr class="hover:bg-gray-50">
+                            <td class="border px-2 py-1 font-semibold text-left">{{ $row[0] }}</td>
+                            <td class="border px-2 py-1">{{ $row[1] }}</td>
+                            <td class="border px-2 py-1">{{ $row[2] }}</td>
+                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row[3] }}</td>
+
+                            {{-- Belum Visit --}}
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][0] }}</td>
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][1] }}</td>
+                            <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">{{ $row[4][2] }}</td>
+
+                            {{-- Sudah Visit --}}
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][0] }}</td>
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][1] }}</td>
+                            <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">{{ $row[5][2] }}</td>
+
+                            {{-- Grand Total --}}
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][0] }}</td>
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][1] }}</td>
+                            <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $row[6][2] }}</td>
+
+                            {{-- Persentase --}}
+                            <td class="border px-2 py-1 font-bold {{ floatval(str_replace(',','.',rtrim($row[7],'%'))) > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
+                                {{ $row[7] }}
+                            </td>
+
+                            {{-- Keterangan --}}
+                            <td class="border px-2 py-1 text-sm text-gray-700">{{ $row[8] }}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
