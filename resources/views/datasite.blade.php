@@ -139,7 +139,6 @@
 
 </div>
 
-{{-- Script --}}
 <script>
     let sites = @json($sites);
 
