@@ -1,66 +1,64 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Monitoring Tower</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tower Bersama Group</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+  <!-- Optional: font & icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-blue-100 via-white to-blue-200 min-h-screen flex items-center justify-center font-sans">
+<body class="min-h-screen bg-cover bg-no-repeat bg-center flex items-center justify-center" style="background-image: url('/assets/bg.png');">
 
-    <div class="bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row w-[900px] max-w-4xl">
-        <!-- Kiri: Logo dan Info -->
-        <div class="bg-blue-600 text-white rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none flex flex-col justify-center items-center md:w-1/2 p-10">
-            <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-32 h-32 mb-4">
-            <h2 class="text-3xl font-bold mb-2">Monitoring Tower</h2>
-            <p class="text-blue-100 text-center px-6">
-                Selamat datang di sistem monitoring tower!  
-                Silakan login untuk melanjutkan ke dashboard.
-            </p>
+  <div class="bg-white w-[900px] md:w-[1000px] h-[480px] rounded-[2rem] shadow-lg flex overflow-hidden">
+
+    <!-- Left Side -->
+    <div class="w-1/2 bg-cover bg-left border-8 border-white rounded-[2rem] relative bg-blend-soft-light" 
+         style="background-image: url('/assets/bg2.png'); background-color: rgba(0, 0, 0, 0.5);">
+            <div class="absolute bottom-20 left-10 text-white z-10">
+                <h1 class="text-2xl font-bold leading-snug">
+                Accelerating<br>Connectivity with<br>Sustainable Growth
+                </h1>
+            </div>
         </div>
 
-        <!-- Kanan: Form Login -->
-        <div class="flex flex-col justify-center items-center md:w-1/2 p-10">
-            <h2 class="text-3xl font-bold text-blue-700 mb-6">Login</h2>
+    <!-- Right Side -->
+    <div class="w-1/2 flex flex-col items-center justify-center px-10 text-gray-700">
+      <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-40 mb-5">
+      <p class="text-sm text-gray-500 mb-6 text-center">Silahkan login menggunakan Username & Password anda!</p>
 
-            @if(session('error'))
-                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 w-full text-center">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <form action="{{ route('login.proses') }}" method="POST" class="w-full max-w-sm space-y-4">
-                @csrf
-                <div>
-                    <label for="email" class="block text-gray-700 font-semibold mb-1">Email</label>
-                    <input type="email" name="email" id="email" required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-gray-700 font-semibold mb-1">Password</label>
-                    <input type="password" name="password" id="password" required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div class="flex items-center justify-between mt-2">
-                    <label class="flex items-center text-sm text-gray-600">
-                        <input type="checkbox" class="mr-2"> Ingat saya
-                    </label>
-                    <a href="#" class="text-blue-600 text-sm hover:underline">Lupa password?</a>
-                </div>
-
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded-lg mt-4 hover:bg-blue-700 transition duration-300">
-                    Masuk
-                </button>
-            </form>
-
-            <p class="text-gray-500 text-sm mt-6">
-                © 2025 Monitoring Tower. All rights reserved.
-            </p>
+      <form class="w-full max-w-sm">
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-semibold mb-1">Username</label>
+          <input id="username" type="text" placeholder="Username"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
+
+        <div class="mb-6 relative">
+          <label for="password" class="block text-sm font-semibold mb-1">Password</label>
+          <input id="password" type="password" placeholder="Password"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <button type="button" class="absolute right-3 top-8 text-gray-400 hover:text-gray-600">
+            <span class="material-symbols-outlined">
+visibility
+</span>
+          </button>
+        </div>
+
+        <button type="submit" class="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-md transition">
+          Login
+        </button>
+      </form>
     </div>
+  </div>
 
 </body>
 </html>

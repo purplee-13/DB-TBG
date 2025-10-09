@@ -1,6 +1,6 @@
 <nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <div><a href="{{ url('/') }}"><img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10"></a></div>
+        <div><a href="{{ url('/dashboard') }}"><img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10"></a></div>
         <div class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-[#022CB8]">calendar_clock</span>
                 <p class="text-sm text-[#022CB8]"><span id="current-date"></span>, <span id="current-time"></span></p>
@@ -9,7 +9,7 @@
 
     {{-- Tengah: Menu --}}
     <ul class="flex gap-6 text-gray-700 font-medium">
-        <li><a href="{{ url('/') }}" class="hover:text-blue-600">Dashboard</a></li>
+        <li><a href="{{ url('/dashboard') }}" class="hover:text-blue-600">Dashboard</a></li>
         <li><a href="{{ url('/datasite') }}" class="hover:text-blue-600">Data Site</a></li>
         <li><a href="{{ url('/update-maintenance') }}" class="hover:text-blue-600">Update Maintenance</a></li>
     </ul>
