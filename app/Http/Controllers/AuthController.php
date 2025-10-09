@@ -3,32 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // Menampilkan halaman login
-    public function index()
+    // Tampilkan form login
+    public function showLoginForm()
     {
-        return view('login');
+        return view('auth.login');
     }
 
     // Proses login
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        // validasi sederhana
+        $username = $request->input('username');
+        $password = $request->input('password');
 
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('/dashboard');
+        // contoh hardcode user login
+        if ($username === 'admin' && $password === '12345') {
+            return redirect()->route('dashboard');
         }
 
-        return back()->with('error', 'Email atau password salah!');
+        return back()->withErrors([
+            'login' => 'Username atau password salah!',
+        ]);
     }
 
-    // Logout
-    public function logout()
+    // Halaman dashboard setelah login berhasil
+    public function dashboard()
     {
-        Auth::logout();
-        return redirect('/login');
+        return view('dashboard');
     }
 }

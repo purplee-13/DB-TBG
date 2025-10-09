@@ -1,60 +1,31 @@
-@extends('layouts.admin')
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow" style="width: 400px;">
+        <h4 class="text-center mb-3">Login Admin</h4>
 
-@section('content')
-<body class="bg-gradient-to-br from-blue-100 via-white to-blue-200 min-h-screen flex items-center justify-center font-sans">
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
-    <div class="bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row w-[900px] max-w-4xl">
-        <!-- Kiri: Logo dan Info -->
-        <div class="bg-blue-600 text-white rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none flex flex-col justify-center items-center md:w-1/2 p-10">
-            <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-32 h-32 mb-4">
-            <h2 class="text-3xl font-bold mb-2">Monitoring Tower</h2>
-            <p class="text-blue-100 text-center px-6">
-                Selamat datang di sistem monitoring tower!  
-                Silakan login untuk melanjutkan ke dashboard.
-            </p>
-        </div>
+        <form method="POST" action="{{ route('login.post') }}">
+            @csrf
+            <div class="mb-3">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="Masukkan username">
+            </div>
 
-        <!-- Kanan: Form Login -->
-        <div class="flex flex-col justify-center items-center md:w-1/2 p-10">
-            <h2 class="text-3xl font-bold text-blue-700 mb-6">Login</h2>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="Masukkan password">
+            </div>
 
-            @if(session('error'))
-                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 w-full text-center">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <form action="{{ route('login.proses') }}" method="POST" class="w-full max-w-sm space-y-4">
-                @csrf
-                <div>
-                    <label for="email" class="block text-gray-700 font-semibold mb-1">Email</label>
-                    <input type="email" name="email" id="email" required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-gray-700 font-semibold mb-1">Password</label>
-                    <input type="password" name="password" id="password" required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-
-                <div class="flex items-center justify-between mt-2">
-                    <label class="flex items-center text-sm text-gray-600">
-                        <input type="checkbox" class="mr-2"> Ingat saya
-                    </label>
-                    <a href="#" class="text-blue-600 text-sm hover:underline">Lupa password?</a>
-                </div>
-
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded-lg mt-4 hover:bg-blue-700 transition duration-300">
-                    Masuk
-                </button>
-            </form>
-
-            <p class="text-gray-500 text-sm mt-6">
-                © 2025 Monitoring Tower. All rights reserved.
-            </p>
-        </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
     </div>
 </body>
-@endsection
+</html>
