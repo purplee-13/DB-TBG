@@ -8,10 +8,34 @@ use Illuminate\Validation\Rule;
 
 class SiteController extends Controller
 {
+    public function store(Request $request)
+    {
+        $request->validate([
+            'site_code' => 'required|unique:sites,site_code',
+            'site_name' => 'required|string',
+            'service_area' => 'required|string',
+            'sto' => 'required|string',
+            'product' => 'required|string',
+            'tikor' => 'nullable|string',
+        ], [
+            'site_code.unique' => 'Kode site sudah digunakan, silakan masukkan kode lain.',
+            'site_code.required' => 'Kode site wajib diisi.',
+            'site_name.required' => 'Nama site wajib diisi.',
+            'service_area.required' => 'Service area wajib dipilih.',
+            'sto.required' => 'STO wajib dipilih.',
+            'product.required' => 'Product wajib dipilih.'
+        ]);
+
+        Site::create($request->only([
+            'site_code','site_name','service_area','sto','product','tikor'
+        ]));
+
+        return redirect()->route('datasite')->with('success','Site berhasil ditambahkan.');
+    }
     public function index()
     {
         $sites = Site::orderBy('id','desc')->get();
-        return view('sites.index', compact('sites'));
+        return view('datasite', compact('sites'));
     }
 
     public function create()
@@ -19,24 +43,6 @@ class SiteController extends Controller
         return view('sites.create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'site_code' => 'required|unique:sites,site_code',
-            'site_name' => 'required|string',
-            'service_area' => 'nullable|string',
-            'sto' => 'nullable|string',
-            'product' => 'nullable|string',
-            'tikor' => 'nullable|string',
-            'status' => 'required|string',
-        ]);
-
-        Site::create($request->only([
-            'site_code','site_name','service_area','sto','product','tikor','status'
-        ]));
-
-        return redirect()->route('sites.index')->with('success','Site berhasil ditambahkan.');
-    }
 
     public function edit(Site $site)
     {
@@ -63,8 +69,8 @@ class SiteController extends Controller
     }
 
     public function destroy(Site $site)
-    {
-        $site->delete();
-        return redirect()->route('sites.index')->with('success','Site berhasil dihapus.');
+    { 
+    $site->delete();
+    return redirect()->route('datasite')->with('success','Site berhasil dihapus.');
     }
 }
