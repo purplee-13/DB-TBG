@@ -1,3 +1,18 @@
+    {{-- Notifikasi Sukses dan Gagal --}}
+    @if (session('success'))
+        <div id="notif-success" class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div id="notif-error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
+            <ul class="list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 @extends('layouts.admin')
 
 @section('content')
@@ -6,8 +21,8 @@
     {{-- =================== SEARCH & ADD =================== --}}
     <div class="flex justify-end items-center mb-4 gap-3">
         <div class="relative">
-            <input type="text" id="searchInput" placeholder="Cari"
-                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="text" id="searchInput" placeholder="Cari Site ID / Name / Area"
+                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300" oninput="searchSiteId()">
             <span class="absolute left-3 top-2.5 text-gray-500">
                 <i class="fas fa-search"></i>
             </span>
@@ -24,65 +39,62 @@
 
     {{-- =================== TABLE =================== --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
-        <table class="min-w-full text-sm" id="sitesTable">
-            <thead class="bg-blue-600 text-white">
-                <tr>
-                    <th class="py-3 px-4 text-left">NO</th>
-                    <th class="py-3 px-4 text-left">Site ID</th>
-                    <th class="py-3 px-4 text-left">Site Name</th>
-                    <th class="py-3 px-4 text-left">Service Area</th>
-                    <th class="py-3 px-4 text-left">STO</th>
-                    <th class="py-3 px-4 text-left">Product</th>
-                    <th class="py-3 px-4 text-left">Tikor</th>
-                    <th class="py-3 px-4 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody" class="divide-y">
-                @php
-                    $sites = [
-                        ['id' => '2814082004','name'=>'Site Name IBS Tanete_Rilau','area'=>'SA PAREPARE','sto'=>'BAR','product'=>'MMP (Fiberization)','tikor'=>'-4.26268, 119.63047'],
-                        ['id' => '2814092004','name'=>'IBS Palandro_Mallusetasi','area'=>'SA PAREPARE','sto'=>'BAR','product'=>'MMP (Fiberization)','tikor'=>'-4.1841, 119.63792'],
-                        ['id' => '2815062001','name'=>'IBS Mangkoso','area'=>'SA PAREPARE','sto'=>'BAR','product'=>'MMP (Fiberization)','tikor'=>'-4.21705, 119.61688'],
-                    ];
-                @endphp
-
-                @foreach ($sites as $index => $site)
+        <div style="max-height:595px; overflow-y:auto;">
+            <table class="min-w-full text-sm" id="sitesTable">
+                <thead class="bg-blue-600 text-white" style="position:sticky;top:0;z-index:2;">
+                    <tr>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">NO</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site ID</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site Name</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Service Area</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">STO</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Product</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Tikor</th>
+                        <th class="py-3 px-4 text-center" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y">
+                    @foreach ($sites as $index => $site)
                     <tr>
                         <td class="py-2 px-4">{{ $index + 1 }}</td>
-                        <td class="py-2 px-4">{{ $site['id'] }}</td>
-                        <td class="py-2 px-4">{{ $site['name'] }}</td>
-                        <td class="py-2 px-4">{{ $site['area'] }}</td>
-                        <td class="py-2 px-4">{{ $site['sto'] }}</td>
-                        <td class="py-2 px-4">{{ $site['product'] }}</td>
-                        <td class="py-2 px-4">{{ $site['tikor'] }}</td>
+                        <td class="py-2 px-4">{{ $site->site_code }}</td>
+                        <td class="py-2 px-4">{{ $site->site_name }}</td>
+                        <td class="py-2 px-4">{{ $site->service_area }}</td>
+                        <td class="py-2 px-4">{{ $site->sto }}</td>
+                        <td class="py-2 px-4">{{ $site->product }}</td>
+                        <td class="py-2 px-4">{{ $site->tikor }}</td>
                         <td class="py-2 px-4 text-center flex justify-center gap-3">
-                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit"><i class="fas fa-pen"></i></button>
-                            <button class="text-red-600 hover:text-red-800 delete-btn" title="Hapus"><i class="fas fa-trash"></i></button>
+                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})"><i class="fas fa-pen"></i></button>
+                            <form method="POST" action="{{ route('datasite.delete', $site->id) }}" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                @csrf
+                                <button type="submit" class="text-red-600 hover:text-red-800 delete-btn" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </form>
                         </td>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {{-- Modal Tambah/Edit Site --}}
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Site</h2>
-            <form id="siteForm">
-                <input type="hidden" id="editIndex">
+            <form method="POST" action="{{ route('datasite.store') }}">
+                @csrf
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Site ID</label>
-                    <input type="text" id="siteId" class="w-full border rounded-lg px-3 py-2">
+                    <label class="block text-sm font-medium">Site Id</label>
+                    <input type="number" name="site_code" class="w-full border rounded-lg px-3 py-2" required min="1" step="1" pattern="[0-9]+">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Name</label>
-                    <input type="text" id="siteName" class="w-full border rounded-lg px-3 py-2">
+                    <input type="text" name="site_name" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Service Area</label>
-                    <select id="siteArea" class="w-full border rounded-lg px-3 py-2">
-                        <option>Pilih Service Area</option>
+                    <select name="service_area" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Pilih Service Area</option>
                         @foreach(array_keys(config('sto')) as $area)
                             <option value="{{ $area }}">{{ $area }}</option>
                         @endforeach
@@ -90,20 +102,26 @@
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">STO</label>
-                    <select id="siteSTO" class="w-full border rounded-lg px-3 py-2">
+                    <select name="sto" class="w-full border rounded-lg px-3 py-2" required>
                         <option value="">Pilih STO</option>
+                        @foreach(array_unique(array_merge(...array_values(config('sto')))) as $sto)
+                            <option value="{{ $sto }}">{{ $sto }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
-                    <input type="text" id="siteProduct" class="w-full border rounded-lg px-3 py-2">
+                    <select name="product" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Pilih Product</option>
+                        <option value="INTERSITE FO">INTERSITE FO</option>
+                        <option value="MMP">MMP</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Tikor</label>
-                    <input type="text" id="siteTikor" placeholder="-4.12345, 120.67890"
+                    <input type="text" name="tikor" placeholder="-4.12345, 120.67890"
                         class="w-full border rounded-lg px-3 py-2">
                 </div>
-
                 <div class="flex justify-end gap-3 mt-4">
                     <button type="button" onclick="closeAddModal()" 
                         class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
@@ -118,68 +136,47 @@
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
             <h2 class="text-xl font-bold mb-4">Edit Site</h2>
-            <form>
-                <input type="hidden" id="editSiteIndex">
-
+            <form id="editSiteForm" method="POST">
+                @csrf
+                <input type="hidden" name="_method" value="POST">
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Site ID</label>
-                    <input id="editSiteID" type="text" 
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <label class="block text-sm font-medium">Site Id</label>
+                    <input type="number" id="editSiteID" name="site_code" class="w-full border rounded-lg px-3 py-2" required min="1" step="1" pattern="[0-9]+">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Name</label>
-                    <input id="editSiteName" type="text" 
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="editSiteName" name="site_name" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Service Area</label>
-                    <select id="editServiceArea" 
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-                        <option>SA PAREPARE</option>
-                        <option>SA PALOPO</option>
-                        <option>SA MAJENE</option>
-                        <option>SA PINRANG</option>
+                    <select id="editServiceArea" name="service_area" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Pilih Service Area</option>
+                        @foreach(array_keys(config('sto')) as $area)
+                            <option value="{{ $area }}">{{ $area }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">STO</label>
-                    <select id="editSTO"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-                        <option>BAR</option>
-                        <option>BLP</option>
-                        <option>ENR</option>
-                        <option>MAJ</option>
-                        <option>MAK</option>
-                        <option>MAM</option>
-                        <option>MAS</option>
-                        <option>MLL</option>
-                        <option>MMS</option>
-                        <option>PIN</option>
-                        <option>PKA</option>
-                        <option>PLP</option>
-                        <option>PLW</option>
-                        <option>PRE</option>
-                        <option>RTP</option>
-                        <option>SID</option>
-                        <option>SIW</option>
-                        <option>SKG</option>
-                        <option>TMN</option>
-                        <option>TPY</option>
-                        <option>TTE</option>
-                        <option>WTG</option>
+                    <select id="editSTO" name="sto" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Pilih STO</option>
+                        @foreach(array_unique(array_merge(...array_values(config('sto')))) as $sto)
+                            <option value="{{ $sto }}">{{ $sto }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
-                    <input id="editProduct" type="text"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <select id="editProduct" name="product" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Pilih Product</option>
+                        <option value="INTERSITE FO">INTERSITE FO</option>
+                        <option value="MMP">MMP</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Tikor</label>
-                    <input id="editTikor" type="text"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" id="editTikor" name="tikor" class="w-full border rounded-lg px-3 py-2">
                 </div>
-
                 <div class="flex justify-end gap-3 mt-4">
                     <button type="button" onclick="closeEditModal()" 
                         class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
@@ -193,127 +190,93 @@
 </div>
 
 <script>
+    function openEditModal(siteId) {
+        // Cari data site dari array sites
+        const site = sites.find(s => s.id === siteId);
+        if (!site) return;
+        document.getElementById('editSiteID').value = site.site_code;
+        document.getElementById('editSiteName').value = site.site_name;
+        document.getElementById('editServiceArea').value = site.service_area;
+        document.getElementById('editSTO').value = site.sto;
+        document.getElementById('editProduct').value = site.product;
+        document.getElementById('editTikor').value = site.tikor;
+        // Set action form
+        document.getElementById('editSiteForm').action = `/datasite/${siteId}/update`;
+        // Tampilkan modal
+        document.getElementById('editModal').classList.remove('hidden');
+        document.getElementById('editModal').classList.add('flex');
+    }
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.getElementById('editModal').classList.remove('flex');
+    }
+    // Hilangkan notifikasi otomatis setelah 5 detik
+    window.onload = function() {
+        setTimeout(function() {
+            var notifSuccess = document.getElementById('notif-success');
+            if (notifSuccess) notifSuccess.style.display = 'none';
+            var notifError = document.getElementById('notif-error');
+            if (notifError) notifError.style.display = 'none';
+        }, 5000);
+    };
     let sites = @json($sites);
 
-    function openModal(editIndex = null) {
-        document.getElementById('addModal').classList.remove('hidden');
-        document.getElementById('addModal').classList.add('flex');
-
-        if (editIndex !== null) {
-            document.getElementById('modalTitle').innerText = "Edit Site";
-            document.getElementById('editIndex').value = editIndex;
-            const site = sites[editIndex];
-            document.getElementById('siteId').value = site.id;
-            document.getElementById('siteName').value = site.name;
-            document.getElementById('siteArea').value = site.area;
-            const areaSelect = document.getElementById('siteArea');
-            areaSelect.dispatchEvent(new Event('change'));
-            setTimeout(() => {
-                document.getElementById('siteSTO').value = site.sto;
-            }, 100);
-            document.getElementById('siteProduct').value = site.product;
-            document.getElementById('siteTikor').value = site.tikor;
-        } else {
-            document.getElementById('modalTitle').innerText = "Tambah Site";
-            document.getElementById('editIndex').value = "";
-            document.getElementById('siteForm').reset();
+    function searchSiteId() {
+        const input = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (input === "") {
+            renderTable(sites);
+            return;
         }
+        // Filter berdasarkan site_code, site_name, atau service_area
+        const filtered = sites.filter(site => {
+            return String(site.site_code).toLowerCase().includes(input)
+                || String(site.site_name).toLowerCase().includes(input)
+                || String(site.service_area).toLowerCase().includes(input);
+        });
+        renderTable(filtered);
     }
 
-    function closeModal() {
-        document.getElementById('addModal').classList.add('hidden');
-    }
-
-    document.getElementById('siteForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const id = document.getElementById('siteId').value;
-        const name = document.getElementById('siteName').value;
-        const area = document.getElementById('siteArea').value;
-        const sto = document.getElementById('siteSTO').value;
-        const product = document.getElementById('siteProduct').value;
-        const tikor = document.getElementById('siteTikor').value;
-        const editIndex = document.getElementById('editIndex').value;
-
-        if (editIndex) {
-            // Edit
-            sites[editIndex] = {id, name, area, sto, product, tikor};
-        } else {
-            // Tambah
-            sites.push({id, name, area, sto, product, tikor});
-        }
-
-        renderTable();
-        closeModal();
-    });
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = "";
-        sites.forEach((site, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="py-2 px-4">${index + 1}</td>
-                <td class="py-2 px-4">${site.id}</td>
-                <td class="py-2 px-4">${site.name}</td>
-                <td class="py-2 px-4">${site.area}</td>
-                <td class="py-2 px-4">${site.sto}</td>
-                <td class="py-2 px-4">${site.product}</td>
-                <td class="py-2 px-4">${site.tikor}</td>
-                <td class="py-2 px-4 text-center flex justify-center gap-3">
-                    <button class="text-blue-600 hover:text-blue-800 edit-btn" onclick="openModal(${index})"><i class="fas fa-pen"></i></button>
-                    <button class="text-red-600 hover:text-red-800 delete-btn" onclick="deleteRow(${index})"><i class="fas fa-trash"></i></button>
-                </td>
+    function renderTable(data) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = "";
+        data.forEach((site, index) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td class='py-2 px-4'>${index + 1}</td>
+                    <td class='py-2 px-4'>${site.site_code}</td>
+                    <td class='py-2 px-4'>${site.site_name}</td>
+                    <td class='py-2 px-4'>${site.service_area}</td>
+                    <td class='py-2 px-4'>${site.sto}</td>
+                    <td class='py-2 px-4'>${site.product}</td>
+                    <td class='py-2 px-4'>${site.tikor}</td>
+                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
+                        <button class='text-blue-600 hover:text-blue-800 edit-btn' title='Edit' onclick='openEditModal(${site.id})'><i class='fas fa-pen'></i></button>
+                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit='return confirm("Yakin ingin menghapus data ini?")'>
+                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                            <button type='submit' class='text-red-600 hover:text-red-800 delete-btn' title='Hapus'><i class='fas fa-trash'></i></button>
+                        </form>
+                    </td>
+                </tr>
             `;
-            tbody.appendChild(tr);
         });
     }
 
-    function deleteRow(index) {
-        if (confirm("Yakin ingin menghapus data ini?")) {
-            sites.splice(index, 1);
-            renderTable();
-        }
-    }
+    // Render awal semua data
+    renderTable(sites);
 
+    function openAddModal() {
+        const modal = document.getElementById('addModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function closeAddModal() {
+        const modal = document.getElementById('addModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
     function clearSearch() {
         document.getElementById('searchInput').value = "";
+        renderTable(sites);
     }
-
-    const stoData = @json(config('sto'));
-
-    document.getElementById('siteArea').addEventListener('change', function() {
-        const area = this.value;
-        const stoSelect = document.getElementById('siteSTO');
-        stoSelect.innerHTML = '<option value="">-- Pilih STO --</option>';
-
-        if (stoData[area]) {
-            stoData[area].forEach(sto => {
-                const opt = document.createElement('option');
-                opt.value = sto;
-                opt.textContent = sto;
-                stoSelect.appendChild(opt);
-            });
-        }
-    });
-
-    document.getElementById('siteSTO').addEventListener('change', function() {
-        const area = this.value;
-        const stoSelect = document.getElementById('siteSTO');
-        stoSelect.innerHTML = '<option value="">Pilih STO</option>';
-
-        const stoData = @json(config('sto'));
-        
-        if (stoData[area]) {
-            Object.entries(stoData[area]).forEach(([code, name]) => {
-                const option = document.createElement('option');
-                option.value = code;
-                option.textContent = `${code} - ${name}`;
-                stoSelect.appendChild(option);
-            });
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", renderTable);
 </script>
 @endsection

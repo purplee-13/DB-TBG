@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 
+
 // Redirect awal ke login
 Route::get('/', function () {
     return redirect()->route('login');
@@ -18,8 +19,14 @@ Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
 Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
 // 🟢 DATA SITE
-Route::get('/datasite', [Controller::class, 'datasite'])->name('datasite');
-Route::post('/datasite/store', [Controller::class, 'storeSite'])->name('datasite.store');
+Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');
+Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
+
+// Edit Site
+Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');
+Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::class, 'update'])->name('datasite.update');
+// Hapus Site
+Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::class, 'destroy'])->name('datasite.delete');
 
 // 🟢 UPDATE MAINTENANCE
 Route::get('/update-maintenance', [Controller::class, 'updateMaintenance'])->name('update.maintenance');
