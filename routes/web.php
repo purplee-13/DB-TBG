@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\MaintenanceController;
 
 // Redirect awal ke login
 Route::get('/', function () {
@@ -24,5 +25,5 @@ Route::get('/datasite', [SiteController::class, 'datasite'])->name('datasite');
 Route::post('/datasite/store', [SiteController::class, 'storeSite'])->name('datasite.store');
 
 // 🟢 UPDATE MAINTENANCE
-// Route::get('/update-maintenance', [SiteController::class, 'updateMaintenance'])->name('update.maintenance');
+Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('update-maintenance');
 // Route::post('/update-maintenance/store', [SiteController::class, 'storeMaintenance'])->name('maintenance.store');

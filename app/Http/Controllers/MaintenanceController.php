@@ -11,8 +11,8 @@ class MaintenanceController extends Controller
 {
     public function index()
     {
-        $maintenances = Maintenance::with('site')->orderBy('visit_date','desc')->get();
-        return view('maintenances.index', compact('maintenances'));
+        // $maintenances = Maintenance::with('site')->orderBy('visit_date','desc')->get();
+        return view('update-maintenance');
     }
 
     public function create()
