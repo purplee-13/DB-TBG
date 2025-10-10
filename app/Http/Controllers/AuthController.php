@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    // 🔹 Tampilkan halaman login
+    // 🔹 Menampilkan form login
     public function showLoginForm()
     {
         return view('login');
@@ -19,19 +20,32 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required',
-            'password' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:20',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&_]/',
+            ],
+        ], [
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 20 karakter',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
         ]);
 
-        // Ambil data user dari database
+        // Cari user berdasarkan username
         $user = User::where('username', $request->username)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            // Simpan session
+            // Simpan data user ke session
             session([
                 'user_id' => $user->id,
                 'username' => $user->username,
-                'role' => $user->role,
                 'name' => $user->name,
+                'role' => $user->role,
             ]);
 
             return redirect()->route('dashboard');
@@ -40,11 +54,11 @@ class AuthController extends Controller
         return back()->withErrors(['login' => 'Username atau password salah!']);
     }
 
-    // 🔹 Halaman dashboard
+    // 🔹 Dashboard hanya bisa diakses setelah login
     public function dashboard()
     {
-        if (!session('user_id')) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu!');
+        if (!session()->has('user_id')) {
+            return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
         }
 
         return view('dashboard');
@@ -54,6 +68,6 @@ class AuthController extends Controller
     public function processLogout()
     {
         session()->flush();
-        return redirect()->route('login')->with('success', 'Berhasil logout!');
+        return redirect()->route('login')->with('success', 'Anda telah logout.');
     }
 }
