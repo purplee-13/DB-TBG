@@ -53,7 +53,7 @@
           <label for="password" class="block text-sm font-semibold mb-1">Password</label>
           <input id="password" name="password" type="password" placeholder="Password"
                  class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
-          <button type="button" class="absolute right-3 top-8 text-gray-400 hover:text-gray-600">
+          <button type="button" id="togglePassword" class="absolute right-3 top-8 text-gray-400 hover:text-gray-600">
             <span class="material-symbols-outlined">visibility</span>
           </button>
         </div>
@@ -66,4 +66,19 @@
   </div>
 
 </body>
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('.material-symbols-outlined');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.textContent = 'visibility';
+        } else {
+            passwordInput.type = 'password';
+            icon.textContent = 'visibility_off';
+        }
+    });
+</script>
 </html>
+
