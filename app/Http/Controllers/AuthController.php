@@ -56,15 +56,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // 🔹 Dashboard hanya bisa diakses setelah login
-    public function dashboard()
-    {
-        if (!session()->has('user_id')) {
-            return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
-        }
-
-        return view('dashboard');
-    }
 
     // 🔹 Logout
     public function processLogout()

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SiteController;
 
 // Redirect awal ke login
 Route::get('/', function () {
@@ -15,12 +17,12 @@ Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post
 Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
 
 // 🟢 DASHBOARD (dari AuthController)
-Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 // 🟢 DATA SITE
-Route::get('/datasite', [Controller::class, 'datasite'])->name('datasite');
-Route::post('/datasite/store', [Controller::class, 'storeSite'])->name('datasite.store');
+Route::get('/datasite', [SiteController::class, 'datasite'])->name('datasite');
+Route::post('/datasite/store', [SiteController::class, 'storeSite'])->name('datasite.store');
 
 // 🟢 UPDATE MAINTENANCE
-Route::get('/update-maintenance', [Controller::class, 'updateMaintenance'])->name('update.maintenance');
-Route::post('/update-maintenance/store', [Controller::class, 'storeMaintenance'])->name('maintenance.store');
+// Route::get('/update-maintenance', [SiteController::class, 'updateMaintenance'])->name('update.maintenance');
+// Route::post('/update-maintenance/store', [SiteController::class, 'storeMaintenance'])->name('maintenance.store');

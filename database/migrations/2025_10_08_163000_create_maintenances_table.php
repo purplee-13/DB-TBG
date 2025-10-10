@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('teknisi')->nullable();
             $table->text('keterangan')->nullable();
             $table->date('tngl_visit')->nullable();
-            $table->enum('progres', ['Pending', 'In Progress', 'Completed'])->default('Pending');
+            $table->enum('progres', ['Visit', 'Belum Visit'])->default('Belum Visit');
             $table->string('operator')->nullable();
             $table->timestamps();
         });

@@ -13,12 +13,11 @@ class Maintenance extends Model
 
     protected $fillable = [
         'site_id',
-        'technician',
-        'description',
-        'visit_date',
-        'status',
+        'teknisi',
+        'keterangan',
+        'tngl_visit',
+        'progres',
         'operator',
-        'notes',
     ];
 
     public function site()

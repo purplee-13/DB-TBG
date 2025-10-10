@@ -18,7 +18,6 @@ class Site extends Model
         'sto',
         'product',
         'tikor',
-        'status',
     ];
 
     public function maintenances()
