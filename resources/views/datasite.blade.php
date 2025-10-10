@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-6">
 
-    {{-- Search & Add Button --}}
+    {{-- =================== SEARCH & ADD =================== --}}
     <div class="flex justify-end items-center mb-4 gap-3">
         <div class="relative">
             <input type="text" id="searchInput" placeholder="Cari"
@@ -16,13 +16,13 @@
             </button>
         </div>
 
-        <button onclick="openModal()" 
+        <button onclick="openAddModal()" 
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1">
             <span class="text-lg font-semibold">+</span> Tambah
         </button>
     </div>
 
-    {{-- Table --}}
+    {{-- =================== TABLE =================== --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
         <table class="min-w-full text-sm" id="sitesTable">
             <thead class="bg-blue-600 text-white">
@@ -83,6 +83,58 @@
                     <label class="block text-sm font-medium">Service Area</label>
                     <select id="siteArea" class="w-full border rounded-lg px-3 py-2">
                         <option>Pilih Service Area</option>
+                        @foreach(array_keys(config('sto')) as $area)
+                            <option value="{{ $area }}">{{ $area }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">STO</label>
+                    <select id="siteSTO" class="w-full border rounded-lg px-3 py-2">
+                        <option value="">Pilih STO</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">Product</label>
+                    <input type="text" id="siteProduct" class="w-full border rounded-lg px-3 py-2">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">Tikor</label>
+                    <input type="text" id="siteTikor" placeholder="-4.12345, 120.67890"
+                        class="w-full border rounded-lg px-3 py-2">
+                </div>
+
+                <div class="flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeAddModal()" 
+                        class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- =================== MODAL EDIT =================== --}}
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
+            <h2 class="text-xl font-bold mb-4">Edit Site</h2>
+            <form>
+                <input type="hidden" id="editSiteIndex">
+
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">Site ID</label>
+                    <input id="editSiteID" type="text" 
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">Site Name</label>
+                    <input id="editSiteName" type="text" 
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium">Service Area</label>
+                    <select id="editServiceArea" 
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                         <option>SA PAREPARE</option>
                         <option>SA PALOPO</option>
                         <option>SA MAJENE</option>
@@ -91,8 +143,8 @@
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">STO</label>
-                    <select id="siteSTO" class="w-full border rounded-lg px-3 py-2">
-                        <option>Pilih STO</option>
+                    <select id="editSTO"
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                         <option>BAR</option>
                         <option>BLP</option>
                         <option>ENR</option>
@@ -119,19 +171,20 @@
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
-                    <input type="text" id="siteProduct" class="w-full border rounded-lg px-3 py-2">
+                    <input id="editProduct" type="text"
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Tikor</label>
-                    <input type="text" id="siteTikor" placeholder="-4.12345, 120.67890"
-                        class="w-full border rounded-lg px-3 py-2">
+                    <input id="editTikor" type="text"
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                 </div>
 
                 <div class="flex justify-end gap-3 mt-4">
-                    <button type="button" onclick="closeModal()" 
+                    <button type="button" onclick="closeEditModal()" 
                         class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
                     <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update</button>
                 </div>
             </form>
         </div>
@@ -153,7 +206,11 @@
             document.getElementById('siteId').value = site.id;
             document.getElementById('siteName').value = site.name;
             document.getElementById('siteArea').value = site.area;
-            document.getElementById('siteSTO').value = site.sto;
+            const areaSelect = document.getElementById('siteArea');
+            areaSelect.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+                document.getElementById('siteSTO').value = site.sto;
+            }, 100);
             document.getElementById('siteProduct').value = site.product;
             document.getElementById('siteTikor').value = site.tikor;
         } else {
@@ -222,6 +279,40 @@
     function clearSearch() {
         document.getElementById('searchInput').value = "";
     }
+
+    const stoData = @json(config('sto'));
+
+    document.getElementById('siteArea').addEventListener('change', function() {
+        const area = this.value;
+        const stoSelect = document.getElementById('siteSTO');
+        stoSelect.innerHTML = '<option value="">-- Pilih STO --</option>';
+
+        if (stoData[area]) {
+            stoData[area].forEach(sto => {
+                const opt = document.createElement('option');
+                opt.value = sto;
+                opt.textContent = sto;
+                stoSelect.appendChild(opt);
+            });
+        }
+    });
+
+    document.getElementById('siteSTO').addEventListener('change', function() {
+        const area = this.value;
+        const stoSelect = document.getElementById('siteSTO');
+        stoSelect.innerHTML = '<option value="">Pilih STO</option>';
+
+        const stoData = @json(config('sto'));
+        
+        if (stoData[area]) {
+            Object.entries(stoData[area]).forEach(([code, name]) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = `${code} - ${name}`;
+                stoSelect.appendChild(option);
+            });
+        }
+    });
 
     document.addEventListener("DOMContentLoaded", renderTable);
 </script>

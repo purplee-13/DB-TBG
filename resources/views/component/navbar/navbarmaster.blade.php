@@ -13,7 +13,7 @@
     </ul>
 
     <div class="flex items-center gap-2">
-        <span class="text-black-600 font-medium">Dea Binti Ingrid</span>
+        <span class="text-black-600 font-medium">{{ session('name') }}</span>
         <div class="bg-black rounded-full w-8 h-8 flex items-center justify-center">
             <span class="material-symbols-outlined text-white">person</span>
         </div>

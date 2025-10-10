@@ -1,20 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 
 // Redirect awal ke login
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect()->route('login');
 });
 
-// 🟢 LOGIN
-Route::get('/login', [Controller::class, 'login'])->name('login');
-Route::post('/login', [Controller::class, 'loginPost'])->name('login.post');
-Route::get('/logout', [Controller::class, 'logout'])->name('logout');
+// 🟢 LOGIN (mengarah ke AuthController)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post');
+Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
 
-// 🟢 DASHBOARD
-Route::get('/dashboard', [Controller::class, 'dashboard'])->name('dashboard');
+// 🟢 DASHBOARD (dari AuthController)
+Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
 // 🟢 DATA SITE
 Route::get('/datasite', [Controller::class, 'datasite'])->name('datasite');

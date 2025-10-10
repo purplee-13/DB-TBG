@@ -13,8 +13,8 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('name')->nullable();
             $table->string('email')->nullable()->unique();
+            $table->enum('role', ['super admin', 'admin', 'pegawai'])->default('pegawai');
             $table->string('password');
-            $table->string('role')->default('admin');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -1,31 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Tower Bersama Group</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-light d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow" style="width: 400px;">
-        <h4 class="text-center mb-3">Login Admin</h4>
+<body class="min-h-screen bg-cover bg-no-repeat bg-center flex items-center justify-center" style="background-image: url('/assets/bg.png');">
 
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+  <div class="bg-white w-[900px] md:w-[1000px] h-[480px] rounded-[2rem] shadow-lg flex overflow-hidden">
 
-        <form method="POST" action="{{ route('login.post') }}">
-            @csrf
-            <div class="mb-3">
-                <label>Username</label>
-                <input type="text" name="username" class="form-control" required placeholder="Masukkan username">
-            </div>
-
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required placeholder="Masukkan password">
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
+    <!-- Left Side -->
+    <div class="w-1/2 bg-cover bg-left border-8 border-white rounded-[2rem] relative bg-blend-soft-light"
+         style="background-image: url('/assets/bg2.png'); background-color: rgba(0, 0, 0, 0.5);">
+        <div class="absolute bottom-20 left-10 text-white z-10">
+            <h1 class="text-2xl font-bold leading-snug">
+                Accelerating<br>Connectivity with<br>Sustainable Growth
+            </h1>
+        </div>
     </div>
+
+    <!-- Right Side -->
+    <div class="w-1/2 flex flex-col items-center justify-center px-10 text-gray-700">
+      <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-40 mb-5">
+      <p class="text-sm text-gray-500 mb-6 text-center">Silahkan login menggunakan Username & Password anda!</p>
+
+      <form method="POST" action="{{ route('login.post') }}" class="w-full max-w-sm">
+        @csrf
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-semibold mb-1">Username</label>
+          <input id="username" name="username" type="text" placeholder="Username"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <div class="mb-6 relative">
+          <label for="password" class="block text-sm font-semibold mb-1">Password</label>
+          <input id="password" name="password" type="password" placeholder="Password"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+          <button type="button" class="absolute right-3 top-8 text-gray-400 hover:text-gray-600">
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+        </div>
+
+        <button type="submit" class="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-md transition">
+          Login
+        </button>
+
+        @if ($errors->has('login'))
+          <div class="text-red-600 text-sm mt-3 text-center">
+            {{ $errors->first('login') }}
+          </div>
+        @endif
+      </form>
+    </div>
+  </div>
+
 </body>
 </html>
