@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\RoleMiddleware;
 
 // Redirect awal ke login
 Route::get('/', function () {
@@ -17,10 +18,13 @@ Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
 // 🟢 DASHBOARD (dari AuthController)
 Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
-// 🟢 DATA SITE
-Route::get('/datasite', [Controller::class, 'datasite'])->name('datasite');
-Route::post('/datasite/store', [Controller::class, 'storeSite'])->name('datasite.store');
+// 🟢 DATA SITE & UPDATE MAINTENANCE (Hanya admin & superadmin)
+Route::middleware([RoleMiddleware::class . ':admin,superadmin'])->group(function () {
+    // DATA SITE
+    Route::get('/datasite', [Controller::class, 'datasite'])->name('datasite');
+    Route::post('/datasite/store', [Controller::class, 'storeSite'])->name('datasite.store');
 
-// 🟢 UPDATE MAINTENANCE
-Route::get('/update-maintenance', [Controller::class, 'updateMaintenance'])->name('update.maintenance');
-Route::post('/update-maintenance/store', [Controller::class, 'storeMaintenance'])->name('maintenance.store');
+    // UPDATE MAINTENANCE
+    Route::get('/update-maintenance', [Controller::class, 'updateMaintenance'])->name('update.maintenance');
+    Route::post('/update-maintenance/store', [Controller::class, 'storeMaintenance'])->name('maintenance.store');
+});

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Site;
 use App\Models\Maintenance;
 
@@ -14,61 +14,55 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    // 🟢 Halaman Login
+    // Halaman login
     public function login()
     {
         return view('login');
     }
 
-    // 🟢 Proses Login (sementara langsung ke dashboard)
+    // Proses login
     public function loginPost(Request $request)
     {
-        // Simulasi login tanpa database
-        Session::put('user', 'admin');
-        return redirect()->route('dashboard');
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            // Login sukses
+            return redirect()->route('dashboard');
+        }
+        // Login gagal
+        return back()->withErrors(['email' => 'Login gagal!']);
     }
 
-    // 🟢 Logout
+    // Logout
     public function logout()
     {
-        Session::forget('user');
+        Auth::logout();
         return redirect()->route('login');
     }
 
-    // 🟢 Dashboard
+    // Dashboard
     public function dashboard()
     {
-        if (!Session::has('user')) {
-            return redirect()->route('login');
-        }
+        // Sudah dijaga oleh middleware auth, tidak perlu cek lagi
         return view('dashboard');
     }
 
-    // 🟢 Data Site
+    // Data Site
     public function datasite()
     {
-        if (!Session::has('user')) {
-            return redirect()->route('login');
-        }
-
         $stoData = config('sto');
         $sites = Site::all();
         return view('datasite', compact('sites', 'stoData'));
     }
 
-    // 🟢 Update Maintenance
+    // Update Maintenance
     public function updateMaintenance()
     {
-        if (!Session::has('user')) {
-            return redirect()->route('login');
-        }
-
         $maintenances = Maintenance::with('site')->get();
         $sites = Site::all();
         return view('update-maintenance', compact('maintenances', 'sites'));
     }
 
-    // 🟢 Simpan Data Site
+    // Simpan Data Site
     public function storeSite(Request $request)
     {
         $request->validate([
@@ -80,13 +74,11 @@ class Controller extends BaseController
             'tikor' => 'nullable',
             'status' => 'required',
         ]);
-
         Site::create($request->all());
-
         return redirect()->route('datasite')->with('success', 'Data site berhasil disimpan!');
     }
 
-    // 🟢 Simpan Data Maintenance
+    // Simpan Data Maintenance
     public function storeMaintenance(Request $request)
     {
         $request->validate([
@@ -98,9 +90,7 @@ class Controller extends BaseController
             'description' => 'nullable',
             'notes' => 'nullable',
         ]);
-
         Maintenance::create($request->all());
-
         return redirect()->route('update.maintenance')->with('success', 'Data maintenance berhasil disimpan!');
     }
 }

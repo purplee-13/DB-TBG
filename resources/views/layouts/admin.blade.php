@@ -12,16 +12,7 @@
 <body class="bg-gray-100 min-h-screen font-sans">
 
     {{-- Include Navbar --}}
-    <!-- @include('component.navbar.navbar') -->
-
-    @if(session('role') === 'super admin')
-        @include('component.navbar.navbarmaster')
-    @elseif(session('role') === 'admin')
-        @include('component.navbar.navbar')
-    @elseif(session('role') === 'pegawai')
-        @include('component.navbar.navbar')
-    @endif
-
+    @include('component.navbar.navbar')
 
     {{-- Konten Utama --}}
     <main class="p-6">
