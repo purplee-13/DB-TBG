@@ -4,21 +4,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, FIRA!</h2>
         <div class="flex gap-4">
-            <select class="border rounded-lg px-3 py-2">
-                <option>Service Area</option>
-                <option>SA Luwu Utara</option>
-                <option>SA Majene</option>
-                <option>SA Mamuju</option>
-                <option>SA Palopo</option>
-                <option>SA Parepare</option>
-                <option>SA PINRANG</option>
-                <option>SA TORAJA</option>
-                <option>SA WAJO</option>
-            </select>
-            <select class="border rounded-lg px-3 py-2">
-                <option>STO</option>
-                <option>PRE</option>
-            </select>
+                <x-service-sto-dropdown />
         </div>
     </div>
 
@@ -29,8 +15,14 @@
                 <h3 class="text-[#022CB8] font-semibold">TOTAL</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $totalSites  }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
-                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                    <span class="material-symbols-outlined {{ $color }} text-sm">{{ $icon }}</span>
+                    @if ($growth > 0)
+                        <p class="{{ $color }} text-sm">+{{ $growth }} dari bulan lalu</p>
+                    @elseif ($growth < 0)
+                        <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
+                    @else
+                        <p class="{{ $color }} text-sm">Tidak ada perubahan</p>
+                    @endif
                 </div>
             </div>
         </div>

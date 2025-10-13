@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
                 'email' => 'admin@example.com',
                 'password' => Hash::make('Password_123'),
                 'role' => 'admin',
-                'remember_token' => Str::random(10),
+                'remember_token' => Str::random(10),    
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

@@ -18,8 +18,16 @@ class AdminController extends Controller
         if (!session()->has('user_id')) {
             return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
         }
+
+        $today = Carbon::now();
+
+        // Jika hari ini tanggal 1, update progres jadi "Belum Visit"
+        if ($today->day === 1) {
+            Maintenance::where('progres', 'Visit')->update(['progres' => 'Belum Visit']);
+        }
         
         $totalSites = DB::table('sites')->count();
+
         $totalVisit = DB::table('maintenances')->where('progres', 'Visit')->count();
         $totalNotVisit = DB::table('maintenances')->where('progres', 'Belum Visit')->count();
         $visitPercentage = $totalSites > 0
@@ -46,6 +54,27 @@ class AdminController extends Controller
             ->groupBy('service_area', 'sto')
             ->orderBy('service_area')
             ->get();
+
+        // Ambil total site dari bulan lalu (berdasarkan created_at)
+        $lastMonth = Carbon::now()->subMonth();
+        $lastMonthTotal = Site::whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
+            ->count();
+
+        // Hitung selisih
+        $growth = $totalSites - $lastMonthTotal;
+
+        // Tentukan warna indikator
+        if ($growth > 0) {
+            $color = 'text-green-500';
+            $icon = 'trending_up';
+        } elseif ($growth < 0) {
+            $color = 'text-red-500';
+            $icon = 'trending_down';
+        } else {
+            $color = 'text-gray-700';
+            $icon = 'trending_flat';
+        }
         
         foreach ($products as $product) {
             $visited = DB::table('maintenances')
@@ -100,6 +129,9 @@ class AdminController extends Controller
                 'dailyTarget' => $dailyTarget,
                 'daysInMonth' => $daysInMonth,
                 'summary' => $summary,
+                'growth' => $growth,
+                'color' => $color,
+                'icon' => $icon,
             ]);
         }
     }

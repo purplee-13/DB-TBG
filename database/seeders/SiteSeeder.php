@@ -37,6 +37,8 @@ class SiteSeeder extends Seeder
             $tikor = $row['F'] ?? null;
 
             if ($siteCode && $siteName && $product) {
+                $monthReference = Carbon::now()->startOfMonth();
+
                 DB::table('sites')->updateOrInsert(
                     ['site_code' => $siteCode],
                     [
@@ -45,6 +47,7 @@ class SiteSeeder extends Seeder
                         'sto' => $sto,
                         'product' => $product,
                         'tikor' => $tikor,
+                        'month_reference'=> $monthReference,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]
