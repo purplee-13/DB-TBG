@@ -18,7 +18,7 @@ class AdminController extends Controller
             return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
         }
         
-        $totalSites = DB::table('sites')->count();
+        $totalSites = DB::table( 'sites')->count();
         $totalVisit = DB::table('maintenances')->where('progres', 'Visit')->count();
         $totalNotVisit = DB::table('maintenances')->where('progres', 'Belum Visit')->count();
         $visitPercentage = $totalSites > 0

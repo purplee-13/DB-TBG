@@ -58,14 +58,13 @@ class SiteController extends Controller
             'sto' => 'nullable|string',
             'product' => 'nullable|string',
             'tikor' => 'nullable|string',
-            'status' => 'required|string',
         ]);
 
         $site->update($request->only([
-            'site_code','site_name','service_area','sto','product','tikor','status'
+            'site_code','site_name','service_area','sto','product','tikor',
         ]));
 
-        return redirect()->route('sites.index')->with('success','Site berhasil diperbarui.');
+        return redirect()->route('datasite')->with('success','Site berhasil diperbarui.');
     }
 
     public function destroy(Site $site)
