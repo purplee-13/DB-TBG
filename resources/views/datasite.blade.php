@@ -1,18 +1,19 @@
-    {{-- Notifikasi Sukses dan Gagal --}}
-    @if (session('success'))
-        <div id="notif-success" class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if ($errors->any())
-        <div id="notif-error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+{{-- Notifikasi Sukses dan Gagal --}}
+@if (session('success'))
+    <div id="notif-success" class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
+        {{ session('success') }}
+    </div>
+@endif
+@if ($errors->any())
+    <div id="notif-error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
+        <ul class="list-disc pl-5">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 @extends('layouts.admin')
 
 @section('content')
@@ -77,9 +78,9 @@
         </div>
     </div>
 
-    {{-- Modal Tambah/Edit Site --}}
-    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
+    {{-- =================== MODAL TAMBAH =================== --}}
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Site</h2>
             <form method="POST" action="{{ route('datasite.store') }}">
                 @csrf
@@ -133,8 +134,8 @@
     </div>
 
     {{-- =================== MODAL EDIT =================== --}}
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
             <h2 class="text-xl font-bold mb-4">Edit Site</h2>
             <form id="editSiteForm" method="POST">
                 @csrf
@@ -191,7 +192,6 @@
 
 <script>
     function openEditModal(siteId) {
-        // Cari data site dari array sites
         const site = sites.find(s => s.id === siteId);
         if (!site) return;
         document.getElementById('editSiteID').value = site.site_code;
@@ -200,17 +200,16 @@
         document.getElementById('editSTO').value = site.sto;
         document.getElementById('editProduct').value = site.product;
         document.getElementById('editTikor').value = site.tikor;
-        // Set action form
         document.getElementById('editSiteForm').action = `/datasite/${siteId}/update`;
-        // Tampilkan modal
         document.getElementById('editModal').classList.remove('hidden');
         document.getElementById('editModal').classList.add('flex');
     }
+
     function closeEditModal() {
         document.getElementById('editModal').classList.add('hidden');
         document.getElementById('editModal').classList.remove('flex');
     }
-    // Hilangkan notifikasi otomatis setelah 5 detik
+
     window.onload = function() {
         setTimeout(function() {
             var notifSuccess = document.getElementById('notif-success');
@@ -219,6 +218,7 @@
             if (notifError) notifError.style.display = 'none';
         }, 5000);
     };
+
     let sites = @json($sites);
 
     function searchSiteId() {
@@ -227,7 +227,6 @@
             renderTable(sites);
             return;
         }
-        // Filter berdasarkan site_code, site_name, atau service_area
         const filtered = sites.filter(site => {
             return String(site.site_code).toLowerCase().includes(input)
                 || String(site.site_name).toLowerCase().includes(input)
@@ -261,7 +260,6 @@
         });
     }
 
-    // Render awal semua data
     renderTable(sites);
 
     function openAddModal() {
@@ -269,11 +267,13 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
+
     function closeAddModal() {
         const modal = document.getElementById('addModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
+
     function clearSearch() {
         document.getElementById('searchInput').value = "";
         renderTable(sites);
