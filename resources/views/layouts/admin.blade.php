@@ -12,7 +12,12 @@
 <body class="bg-gray-100 min-h-screen font-sans">
 
     {{-- Include Navbar --}}
-    @include('component.navbar.navbar')
+    <!-- @include('component.navbar.navbar') -->
+    @if(session('role') === 'master')
+        @include('component.navbar.navbarmaster')
+    @elseif(session('role'))
+        @include('component.navbar.navbar')
+    @endif
 
     {{-- Konten Utama --}}
     <main class="p-6">

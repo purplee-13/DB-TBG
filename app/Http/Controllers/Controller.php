@@ -46,39 +46,8 @@ class Controller extends BaseController
         return view('dashboard');
     }
 
-    // Data Site
-    public function datasite()
-    {
-        $stoData = config('sto');
-        $sites = Site::all();
-        return view('datasite', compact('sites', 'stoData'));
-    }
-
-    // Update Maintenance
-    public function updateMaintenance()
-    {
-        $maintenances = Maintenance::with('site')->get();
-        $sites = Site::all();
-        return view('update-maintenance', compact('maintenances', 'sites'));
-    }
-
-    // Simpan Data Site
-    public function storeSite(Request $request)
-    {
-        $request->validate([
-            'site_code' => 'required',
-            'site_name' => 'required',
-            'service_area' => 'required',
-            'sto' => 'nullable',
-            'product' => 'nullable',
-            'tikor' => 'nullable',
-            'status' => 'required',
-        ]);
-        Site::create($request->all());
-        return redirect()->route('datasite')->with('success', 'Data site berhasil disimpan!');
-    }
-
-    // Simpan Data Maintenance
+    
+    // 🟢 Simpan Data Maintenance
     public function storeMaintenance(Request $request)
     {
         $request->validate([

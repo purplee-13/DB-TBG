@@ -5,24 +5,56 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Site;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Carbon\Carbon;
 
 class SiteSeeder extends Seeder
 {
     public function run(): void
     {
-        $serviceAreas = ['SA PAREPARE', 'SA PALOPO', 'SA MAJENE', 'SA PINRANG'];
-        $stos = ['BAR', 'BLP', 'ENR', 'MAJ', 'MAK', 'MAM', 'MAS', 'MLL', 'MMS', 'PIN', 'PKA', 'PLP', 'PLW', 'PRE', 'RTP', 'SID', 'SIW', 'SKG', 'TMN', 'TPY', 'TTE', 'WTG'];
-        $products = ['INTERSITE FO', 'MMP'];
+        $filePath = database_path('seeders/data/datasites.xlsx');
 
-        for ($i = 1; $i <= 100; $i++) {
-            Site::create([
-                'site_code' => 100000 + $i,
-                'site_name' => 'Site Name ' . $i,
-                'service_area' => $serviceAreas[array_rand($serviceAreas)],
-                'sto' => $stos[array_rand($stos)],
-                'product' => $products[array_rand($products)],
-                'tikor' => '-'.rand(1,9).'.'.rand(10000,99999).', '.rand(100,999).'.'.rand(10000,99999),
-            ]);
+        // Buka file Excel
+        $spreadsheet = IOFactory::load($filePath);
+
+        // Pilih sheet "Sheet1"
+        $sheet = $spreadsheet->getSheetByName('Sheet1');
+        if (!$sheet) {
+            $this->command->error('Sheet1 tidak ditemukan di file Excel!');
+            return;
         }
+
+        $rows = $sheet->toArray(null, true, true, true);
+
+        // Lewati baris pertama (header)
+        foreach (array_slice($rows, 1) as $row) {
+            $siteCode = $row['A'] ?? null;
+            $siteName = $row['B'] ?? null;
+            $serviceArea = $row['C'] ?? null;
+            $sto = $row['D'] ?? null;
+            $product = $row['E'] ?? null;
+            $tikor = $row['F'] ?? null;
+
+            if ($siteCode && $siteName && $product) {
+                $monthReference = Carbon::now()->startOfMonth();
+
+                DB::table('sites')->updateOrInsert(
+                    ['site_code' => $siteCode],
+                    [
+                        'site_name' => $siteName,
+                        'service_area' => $serviceArea,
+                        'sto' => $sto,
+                        'product' => $product,
+                        'tikor' => $tikor,
+                        'month_reference'=> $monthReference,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+            }
+        }
+
+        $this->command->info('✅ Data dari Sheet1 berhasil dimasukkan ke tabel sites!');
     }
 }

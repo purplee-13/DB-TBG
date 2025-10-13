@@ -20,7 +20,13 @@
         <div class="bg-black rounded-full w-8 h-8 flex items-center justify-center">
             <span class="material-symbols-outlined text-white">person</span>
         </div>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="text-red-600 hover:underline text-sm">Logout</button>
+        </form>
     </div>
+
 </nav>
 
 {{-- Script Jam --}}

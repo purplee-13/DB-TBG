@@ -2,23 +2,9 @@
 
 @section('content')
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-3xl font-bold">Selamat Datang, {{ session('username') }}</h2>
+        <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
-            <select class="border rounded-lg px-3 py-2">
-                <option>Service Area</option>
-                <option>SA Luwu Utara</option>
-                <option>SA Majene</option>
-                <option>SA Mamuju</option>
-                <option>SA Palopo</option>
-                <option>SA Parepare</option>
-                <option>SA PINRANG</option>
-                <option>SA TORAJA</option>
-                <option>SA WAJO</option>
-            </select>
-            <select class="border rounded-lg px-3 py-2">
-                <option>STO</option>
-                <option>PRE</option>
-            </select>
+                <x-service-sto-dropdown />
         </div>
     </div>
 
@@ -29,8 +15,14 @@
                 <h3 class="text-[#022CB8] font-semibold">TOTAL</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $totalSites  }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
-                    <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
+                    <span class="material-symbols-outlined {{ $color }} text-sm">{{ $icon }}</span>
+                    @if ($growth > 0)
+                        <p class="{{ $color }} text-sm">+{{ $growth }} dari bulan lalu</p>
+                    @elseif ($growth < 0)
+                        <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
+                    @else
+                        <p class="{{ $color }} text-sm">Tidak ada perubahan</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -64,7 +56,7 @@
                             <img src="{{ asset('assets/icon/persen.png') }}" alt="Persentase" class="w-8 h-8">
                             <h3 class="text-[#022CB8] font-semibold">Persentase</h3>
                         </div>
-                        <p class="text-5xl font-bold text-black-600">{{ $visitPercentage }}%</p>
+                        <p class="text-4xl font-bold text-black-600">{{ $visitPercentage }}%</p>
                         <p class="text-gray-500 text-sm">telah visit dari total Sites</p>
                     </div>
                 </div>
@@ -145,46 +137,44 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $data = [
-                            ['SA LUWU UTARA','MAS',4,2,[35,5,40],[14,1,15],[49,6,55],'27,27%','Belum Terassign'],
-                            ['SA LUWU UTARA','MLL',1,0,[9,2,11],[0,0,0],[9,2,11],'0,00%','Belum Terassign'],
-                            ['SA LUWU UTARA','TMN',2,1,[13,3,16],[11,0,11],[24,3,27],'40,74%','Belum Terassign'],
-                            ['SA MAJENE','MAJ',1,4,[5,3,8],[4,0,4],[9,3,12],'33,33%','Belum Terassign'],
-                            ['SA MAJENE','MMS',1,0,[1,0,1],[0,0,0],[1,0,1],'0,00%','Belum Terassign'],
-                            ['SA MAJENE','PLW',2,1,[22,2,24],[4,2,6],[26,4,30],'20,00%','Belum Terassign'],
-                        ];
-                    @endphp
+                    @foreach($summary as $row)
+                        @php
+                            $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
+                            $sudahAll = $row->visited_fo + $row->visited_mmp;
+                            $grandAll = $belumAll + $sudahAll;
+                            $persen = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
+                        @endphp
 
-                    @foreach($data as $row)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-1 font-semibold text-left">{{ $row[0] }}</td>
-                            <td class="border px-2 py-1">{{ $row[1] }}</td>
-                            <td class="border px-2 py-1">{{ $row[2] }}</td>
-                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row[3] }}</td>
+                            <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
+                            <td class="border px-2 py-1">{{ $row->sto }}</td>
+                            <td class="border px-2 py-1">-</td> {{-- Jumlah Teknisi (belum ada data di DB) --}}
+                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">-</td>
 
                             {{-- Belum Visit --}}
-                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][0] }}</td>
-                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][1] }}</td>
-                            <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">{{ $row[4][2] }}</td>
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_fo }}</td>
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_mmp }}</td>
+                            <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">{{ $belumAll }}</td>
 
                             {{-- Sudah Visit --}}
-                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][0] }}</td>
-                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][1] }}</td>
-                            <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">{{ $row[5][2] }}</td>
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row->visited_fo }}</td>
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row->visited_mmp }}</td>
+                            <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">{{ $sudahAll }}</td>
 
                             {{-- Grand Total --}}
-                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][0] }}</td>
-                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][1] }}</td>
-                            <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $row[6][2] }}</td>
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row->visited_fo + $row->notvisit_fo }}</td>
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row->visited_mmp + $row->notvisit_mmp }}</td>
+                            <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $grandAll }}</td>
 
                             {{-- Persentase --}}
-                            <td class="border px-2 py-1 font-bold {{ floatval(str_replace(',','.',rtrim($row[7],'%'))) > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
-                                {{ $row[7] }}
+                            <td class="border px-2 py-1 font-bold {{ $persen > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
+                                {{ $persen }}%
                             </td>
 
                             {{-- Keterangan --}}
-                            <td class="border px-2 py-1 text-sm text-gray-700">{{ $row[8] }}</td>
+                            <td class="border px-2 py-1 text-sm text-gray-700">
+                                {{ $persen < 30 ? 'Belum Terassign' : 'Progressing' }}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -193,6 +183,9 @@
     </div>
 
     <script>
+        const visitData = @json($dailyVisits);
+        const dailyTarget = @json($dailyTarget);
+        const daysInMonth = @json($daysInMonth);
         const ctx = document.getElementById('trendChart').getContext('2d');
         const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
         gradientBlue.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
@@ -201,11 +194,11 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array.from({ length: 31 }, (_, i) => i + 1),
+                labels: Array.from({ length: daysInMonth }, (_, i) => i + 1),
                 datasets: [
                     {
                         label: 'Jumlah Visit per Hari',
-                        data: [5, 8, 10, 12, 15, 16, 14, 18, 19, 20, 23, 21, 25, 26, 28, 27, 30, 29, 31, 33, 35, 38, 37, 36, 39, 40, 41, 43, 44, 45, 46],
+                        data: visitData,
                         borderColor: '#2563EB',
                         backgroundColor: gradientBlue,
                         borderWidth: 3,
@@ -218,8 +211,8 @@
                         pointHoverBackgroundColor: '#1E40AF',
                     },
                     {
-                        label: 'Target (17)',
-                        data: Array(31).fill(17),
+                        label: `Target (${dailyTarget})`,
+                        data: Array(daysInMonth).fill(dailyTarget),
                         borderColor: '#EF4444',
                         borderWidth: 2,
                         borderDash: [8, 6],
