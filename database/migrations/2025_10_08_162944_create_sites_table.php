@@ -12,11 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('site_code')->unique();
             $table->string('site_name');
-            $table->string('service_area')->nullable();
-            $table->string('sto')->nullable();
-            $table->string('product')->nullable();
+            $table->string('service_area');
+            $table->string('sto');
+            $table->enum('product', ['INTERSITE FO', 'MMP']);
             $table->string('tikor')->nullable();
-            $table->string('status')->default('Aktif');
             $table->timestamps();
         });
     }

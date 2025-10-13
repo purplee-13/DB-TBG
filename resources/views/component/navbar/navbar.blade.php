@@ -9,9 +9,9 @@
 
     {{-- Tengah: Menu --}}
     <ul class="flex gap-6 text-gray-700 font-medium">
-        <li><a href="{{ url('/dashboard') }}" class="hover:text-blue-600">Dashboard</a></li>
-        <li><a href="{{ url('/datasite') }}" class="hover:text-blue-600">Data Site</a></li>
-        <li><a href="{{ url('/update-maintenance') }}" class="hover:text-blue-600">Update Maintenance</a></li>
+        <li><a href="{{ url('/dashboard') }}" class="{{ request()->is('dashboard') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Dashboard</a></li>
+        <li><a href="{{ url('/datasite') }}"  class="{{ request()->is('datasite') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Data Site</a></li>
+        <li><a href="{{ url('/update-maintenance') }}" class="{{ request()->is('update-maintenance') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Update Maintenance</a></li>
     </ul>
 
     {{-- Kanan: Profil --}}
@@ -20,7 +20,13 @@
         <div class="bg-black rounded-full w-8 h-8 flex items-center justify-center">
             <span class="material-symbols-outlined text-white">person</span>
         </div>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="text-red-600 hover:underline text-sm">Logout</button>
+        </form>
     </div>
+
 </nav>
 
 {{-- Script Jam --}}

@@ -2,40 +2,50 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Jalankan seeder.
      */
     public function run(): void
     {
-        User::create([
-            'username' => 'namikaze',
-            'name' => 'minato namikaze',
-            'email' => 'superadmin@gmail.com',
-            'role' => 'super admin',
-            'password' => Hash::make('superadmin3221'),
-        ]);
-
-        User::create([
-            'username' => 'nara',
-            'name' => 'nara shikamaru',
-            'email' => 'nara@gmail.com',
-            'role' => 'admin',
-            'password' => Hash::make('admin3221'),
-        ]);
-
-        User::create([
-            'username' => 'sarutobi',
-            'name' => 'konohamaru',
-            'email' => 'pegawai@gmail.com',
-            'role' => 'pegawai',
-            'password' => Hash::make('pegawai3221'),
+        DB::table('users')->insert([
+            [
+                'username' => 'master01',
+                'name' => 'Master',
+                'email' => 'master@example.com',
+                'password' => Hash::make('Password_123'),
+                'role' => 'master',
+                'remember_token' => Str::random(10),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'username' => 'admin01',
+                'name' => 'Administrator',
+                'email' => 'admin@example.com',
+                'password' => Hash::make('Password_123'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'username' => 'ingridd01',
+                'name' => 'Ingrid Febrianti',
+                'email' => 'ingridd@example.com',
+                'password' => Hash::make('Password_123'),
+                'role' => 'pegawai',
+                'remember_token' => Str::random(10),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ]);
     }
 }

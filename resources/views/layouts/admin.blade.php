@@ -13,15 +13,11 @@
 
     {{-- Include Navbar --}}
     <!-- @include('component.navbar.navbar') -->
-
-    @if(session('role') === 'super admin')
+    @if(session('role') === 'master')
         @include('component.navbar.navbarmaster')
-    @elseif(session('role') === 'admin')
-        @include('component.navbar.navbar')
-    @elseif(session('role') === 'pegawai')
+    @elseif(session('role'))
         @include('component.navbar.navbar')
     @endif
-
 
     {{-- Konten Utama --}}
     <main class="p-6">

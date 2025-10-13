@@ -20,7 +20,20 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required',
-            'password' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:20',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&_]/',
+            ],
+        ], [
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 20 karakter',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
         ]);
 
         // Cari user berdasarkan username
@@ -38,25 +51,17 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return back()->withErrors([
-            'login' => 'Username atau password salah!',
-        ]);
+        return back()->withErrors(['login' => 'Username atau password salah!']);
     }
 
-    // 🔹 Dashboard hanya bisa diakses setelah login
-    public function dashboard()
-    {
-        if (!session()->has('user_id')) {
-            return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
-        }
-
-        return view('dashboard');
-    }
 
     // 🔹 Logout
     public function processLogout()
     {
-        session()->flush();
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
         return redirect()->route('login')->with('success', 'Anda telah logout.');
     }
 }

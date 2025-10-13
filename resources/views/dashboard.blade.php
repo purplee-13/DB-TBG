@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-3xl font-bold">Selamat Datang, {{ session('username') }}</h2>
+        <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
             <select class="border rounded-lg px-3 py-2">
                 <option>Service Area</option>
@@ -27,7 +27,7 @@
             <img src="{{ asset('assets/icon/tower.png') }}" alt="Terverifikasi" class="w-16 h-16">
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">TOTAL</h3>
-                <p class="text-4xl font-bold text-black-600">500</p>
+                <p class="text-4xl font-bold text-black-600">{{ $totalSites  }}</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
                     <p class="text-green-500 text-sm">+1 dari bulan lalu</p>
@@ -38,7 +38,7 @@
             <img src="{{ asset('assets/icon/visit.png') }}" alt="Sudah Visit" class="w-16 h-16">
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
-                <p class="text-4xl font-bold text-black-600">350</p>
+                <p class="text-4xl font-bold text-black-600">{{ $visitedSites }}</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
                     <p class="text-green-500 text-sm">+1 dari hari kemarin</p>
@@ -49,7 +49,7 @@
             <img src="{{ asset('assets/icon/visitno.png') }}" alt="Belum Visit" class="w-16 h-16">
             <div class="text-left">
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
-                <p class="text-4xl font-bold text-black-600">150</p>
+                <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
                     <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
                     <p class="text-red-500 text-sm">-19 dari hari kemarin</p>
@@ -64,7 +64,7 @@
                             <img src="{{ asset('assets/icon/persen.png') }}" alt="Persentase" class="w-8 h-8">
                             <h3 class="text-[#022CB8] font-semibold">Persentase</h3>
                         </div>
-                        <p class="text-5xl font-bold text-black-600">0.2%</p>
+                        <p class="text-4xl font-bold text-black-600">{{ $visitPercentage }}%</p>
                         <p class="text-gray-500 text-sm">telah visit dari total Sites</p>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl text- font-bold text-white">6</p>
+                            <p class="text-3xl text- font-bold text-white">9</p>
                         </div>
                     </div>
                     
@@ -85,7 +85,7 @@
                         <img src="{{ asset('assets/icon/sto.png') }}" alt="STO" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">STO</h3>
-                            <p class="text-3xl font-bold text-white">12</p>
+                            <p class="text-3xl font-bold text-white">22</p>
                         </div>
                     </div>
                 </div>
@@ -103,12 +103,14 @@
 
         <div class="bg-white p-4 rounded-xl shadow">
             <h4 class="font-semibold mb-3">INTERSITE FO</h4>
-            <canvas id="pieChart1"></canvas>
+            <canvas id="pieChartFO"></canvas>
+            <div id="pieChartFOLegend" class="flex justify-center gap-8"></div>
         </div>
 
         <div class="bg-white p-4 rounded-xl shadow">
             <h4 class="font-semibold mb-3">MMP</h4>
-            <canvas id="pieChart2"></canvas>
+            <canvas id="pieChartMMP"></canvas>
+            <div id="pieChartMMPLegend" class="flex justify-center gap-8"></div>
         </div>
     </div>
 
@@ -143,46 +145,44 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $data = [
-                            ['SA LUWU UTARA','MAS',4,2,[35,5,40],[14,1,15],[49,6,55],'27,27%','Belum Terassign'],
-                            ['SA LUWU UTARA','MLL',1,0,[9,2,11],[0,0,0],[9,2,11],'0,00%','Belum Terassign'],
-                            ['SA LUWU UTARA','TMN',2,1,[13,3,16],[11,0,11],[24,3,27],'40,74%','Belum Terassign'],
-                            ['SA MAJENE','MAJ',1,4,[5,3,8],[4,0,4],[9,3,12],'33,33%','Belum Terassign'],
-                            ['SA MAJENE','MMS',1,0,[1,0,1],[0,0,0],[1,0,1],'0,00%','Belum Terassign'],
-                            ['SA MAJENE','PLW',2,1,[22,2,24],[4,2,6],[26,4,30],'20,00%','Belum Terassign'],
-                        ];
-                    @endphp
+                    @foreach($summary as $row)
+                        @php
+                            $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
+                            $sudahAll = $row->visited_fo + $row->visited_mmp;
+                            $grandAll = $belumAll + $sudahAll;
+                            $persen = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
+                        @endphp
 
-                    @foreach($data as $row)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-1 font-semibold text-left">{{ $row[0] }}</td>
-                            <td class="border px-2 py-1">{{ $row[1] }}</td>
-                            <td class="border px-2 py-1">{{ $row[2] }}</td>
-                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row[3] }}</td>
+                            <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
+                            <td class="border px-2 py-1">{{ $row->sto }}</td>
+                            <td class="border px-2 py-1">-</td> {{-- Jumlah Teknisi (belum ada data di DB) --}}
+                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">-</td>
 
                             {{-- Belum Visit --}}
-                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][0] }}</td>
-                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row[4][1] }}</td>
-                            <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">{{ $row[4][2] }}</td>
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_fo }}</td>
+                            <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_mmp }}</td>
+                            <td class="border px-2 py-1 bg-red-200 text-red-800 font-semibold">{{ $belumAll }}</td>
 
                             {{-- Sudah Visit --}}
-                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][0] }}</td>
-                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row[5][1] }}</td>
-                            <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">{{ $row[5][2] }}</td>
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row->visited_fo }}</td>
+                            <td class="border px-2 py-1 bg-green-100 text-green-800">{{ $row->visited_mmp }}</td>
+                            <td class="border px-2 py-1 bg-green-200 text-green-900 font-semibold">{{ $sudahAll }}</td>
 
                             {{-- Grand Total --}}
-                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][0] }}</td>
-                            <td class="border px-2 py-1 bg-gray-100">{{ $row[6][1] }}</td>
-                            <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $row[6][2] }}</td>
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row->visited_fo + $row->notvisit_fo }}</td>
+                            <td class="border px-2 py-1 bg-gray-100">{{ $row->visited_mmp + $row->notvisit_mmp }}</td>
+                            <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $grandAll }}</td>
 
                             {{-- Persentase --}}
-                            <td class="border px-2 py-1 font-bold {{ floatval(str_replace(',','.',rtrim($row[7],'%'))) > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
-                                {{ $row[7] }}
+                            <td class="border px-2 py-1 font-bold {{ $persen > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
+                                {{ $persen }}%
                             </td>
 
                             {{-- Keterangan --}}
-                            <td class="border px-2 py-1 text-sm text-gray-700">{{ $row[8] }}</td>
+                            <td class="border px-2 py-1 text-sm text-gray-700">
+                                {{ $persen < 30 ? 'Belum Terassign' : 'Progressing' }}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -191,6 +191,9 @@
     </div>
 
     <script>
+        const visitData = @json($dailyVisits);
+        const dailyTarget = @json($dailyTarget);
+        const daysInMonth = @json($daysInMonth);
         const ctx = document.getElementById('trendChart').getContext('2d');
         const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
         gradientBlue.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
@@ -199,11 +202,11 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array.from({ length: 31 }, (_, i) => i + 1),
+                labels: Array.from({ length: daysInMonth }, (_, i) => i + 1),
                 datasets: [
                     {
                         label: 'Jumlah Visit per Hari',
-                        data: [5, 8, 10, 12, 15, 16, 14, 18, 19, 20, 23, 21, 25, 26, 28, 27, 30, 29, 31, 33, 35, 38, 37, 36, 39, 40, 41, 43, 44, 45, 46],
+                        data: visitData,
                         borderColor: '#2563EB',
                         backgroundColor: gradientBlue,
                         borderWidth: 3,
@@ -216,8 +219,8 @@
                         pointHoverBackgroundColor: '#1E40AF',
                     },
                     {
-                        label: 'Target (17)',
-                        data: Array(31).fill(17),
+                        label: `Target (${dailyTarget})`,
+                        data: Array(daysInMonth).fill(dailyTarget),
                         borderColor: '#EF4444',
                         borderWidth: 2,
                         borderDash: [8, 6],
@@ -248,53 +251,56 @@
         });
 
         // Pie chart INTERSITE FO
-        new Chart(document.getElementById('pieChart1'), {
-            type: 'pie',
-            data: {
-                labels: ['Belum Visit', 'Visit'],
-                datasets: [{ data: [75, 25], backgroundColor: ['#ef4444', '#22c55e'] }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let value = context.raw;
-                                let total = context.dataset.data.reduce((a,b) => a+b, 0);
-                                let percentage = ((value / total) * 100).toFixed(2);
-                                return `${context.label}: ${percentage}% (${value})`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        const chartData = @json($chartData);
 
-        // Pie chart MMP
-        new Chart(document.getElementById('pieChart2'), {
-            type: 'pie',
-            data: {
-                labels: ['Belum Visit', 'Visit'],
-                datasets: [{ data: [45, 35], backgroundColor: ['#ef4444', '#22c55e'] }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let value = context.raw;
-                                let total = context.dataset.data.reduce((a,b) => a+b, 0);
-                                let percentage = ((value / total) * 100).toFixed(2);
-                                return `${context.label}: ${percentage}% (${value})`;
-                            }
-                        }
+        // Fungsi membuat pie chart
+        function createPieChart(elementId, legendId, data, label) {
+            const visit = data.visited || 0;
+            const notVisit = data.notVisited || 0;
+            const total = visit + notVisit || 1; // hindari pembagian 0
+
+            const ctx = document.getElementById(elementId);
+            const chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Visit', 'Belum Visit'],
+                    datasets: [{
+                        data: [visit, notVisit],
+                        backgroundColor: ['#22c55e', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
                     }
                 }
-            }
-        });
+            });
+
+            // Custom legend
+            const legendContainer = document.getElementById(legendId);
+            const legendHTML = `
+                <div class="flex items-center justify-between gap-6 mt-4">
+                    <!-- Visit -->
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-green-500 text-sm">where_to_vote</span>
+                        <span class="font-medium text-xs">Visit: ${visit}</span>
+                        <span class="text-gray-400 text-xs"> ${((visit / total) * 100).toFixed(1)}%</span>
+                    </div>
+
+                    <!-- Belum Visit -->
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-red-500 text-sm">location_off</span>
+                        <span class="font-medium text-xs">Belum Visit: ${notVisit}</span>
+                        <span class="text-gray-400 text-xs">${((notVisit / total) * 100).toFixed(1)}%</span>
+                    </div>
+                </div>
+            `;
+            legendContainer.innerHTML = legendHTML;
+        }
+
+        // Render kedua chart
+        createPieChart('pieChartFO', 'pieChartFOLegend', chartData['INTERSITE FO'] || { visited: 0, notVisited: 0 }, 'INTERSITE FO');
+        createPieChart('pieChartMMP', 'pieChartMMPLegend', chartData['MMP'] || { visited: 0, notVisited: 0 }, 'MMP');
     </script>
 @endsection
