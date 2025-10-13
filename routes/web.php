@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\MaintenanceController;
 
+use App\Http\Middleware\RoleMiddleware;
 
 // Redirect awal ke login
 Route::get('/', function () {
@@ -18,19 +19,23 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post');
 Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
 
-// 🟢 DASHBOARD (dari AuthController)
-Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-// 🟢 DATA SITE
-Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');
-Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
 
-// Edit Site
-Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');
-Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::class, 'update'])->name('datasite.update');
-// Hapus Site
-Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::class, 'destroy'])->name('datasite.delete');
 
-// 🟢 UPDATE MAINTENANCE
-Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('update-maintenance');
-// Route::post('/update-maintenance/store', [SiteController::class, 'storeMaintenance'])->name('maintenance.store');
+// 🟢 DATA SITE & UPDATE MAINTENANCE (Hanya admin & superadmin)
+Route::middleware([RoleMiddleware::class . ':admin,superadmin'])->group(function () {
+   // 🟢 DATA SITE
+    Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');
+    Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
+
+    // Edit Site
+    Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');
+    Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::class, 'update'])->name('datasite.update');
+    // Hapus Site
+    Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::class, 'destroy'])->name('datasite.delete');
+
+    // 🟢 UPDATE MAINTENANCE
+    Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('update-maintenance');
+    // Route::post('/update-maintenance/store', [SiteController::class, 'storeMaintenance'])->name('maintenance.store');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+});

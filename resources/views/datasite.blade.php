@@ -127,7 +127,7 @@
                     <button type="button" onclick="closeAddModal()" 
                         class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
                     <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update</button>
                 </div>
             </form>
         </div>
