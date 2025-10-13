@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\UserController;
 
 
 // Redirect awal ke login
@@ -16,10 +17,16 @@ Route::get('/', function () {
 // 🟢 LOGIN (mengarah ke AuthController)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post');
-Route::get('/logout', [AuthController::class, 'processLogout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'processLogout'])->name('logout');
 
 // 🟢 DASHBOARD (dari AuthController)
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+// 🟢 KELOLA PENGGUNA
+Route::resource('users', UserController::class);
+Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+Route::get('/kelola-pengguna', [UserController::class, 'index'])->name('user.management');
+
 
 // 🟢 DATA SITE
 Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');

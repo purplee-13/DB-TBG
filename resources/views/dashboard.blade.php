@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-3xl font-bold">Selamat Datang, FIRA!</h2>
+        <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
                 <x-service-sto-dropdown />
         </div>

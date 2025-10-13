@@ -58,7 +58,10 @@ class AuthController extends Controller
     // 🔹 Logout
     public function processLogout()
     {
-        session()->flush();
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
         return redirect()->route('login')->with('success', 'Anda telah logout.');
     }
 }

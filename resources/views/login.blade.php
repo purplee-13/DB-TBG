@@ -13,6 +13,13 @@
     }
   </style>
 </head>
+
+@if(session('success'))
+    <script>
+        alert("{{ session('success') }}");
+    </script>
+@endif
+
 <body class="min-h-screen bg-cover bg-no-repeat bg-center flex items-center justify-center" style="background-image: url('/assets/bg.png');">
 
   <div class="bg-white w-[900px] md:w-[1000px] h-[480px] rounded-[2rem] shadow-lg flex overflow-hidden">
