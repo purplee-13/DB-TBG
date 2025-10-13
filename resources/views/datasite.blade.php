@@ -32,10 +32,13 @@
             </button>
         </div>
 
-        <button onclick="openAddModal()" 
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1">
-            <span class="text-lg font-semibold">+</span> Tambah
-        </button>
+        {{-- Tombol Tambah hanya muncul untuk admin dan master --}}
+        @if(session('role') === 'admin' || session('role') === 'master')
+            <button onclick="openAddModal()" 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1">
+                <span class="text-lg font-semibold">+</span> Tambah
+            </button>
+        @endif
     </div>
 
     {{-- =================== TABLE =================== --}}
@@ -44,14 +47,17 @@
             <table class="min-w-full text-sm" id="sitesTable">
                 <thead class="bg-blue-600 text-white" style="position:sticky;top:0;z-index:2;">
                     <tr>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">NO</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site ID</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site Name</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Service Area</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">STO</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Product</th>
-                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Tikor</th>
-                        <th class="py-3 px-4 text-center" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Aksi</th>
+                        <th class="py-3 px-4 text-left">NO</th>
+                        <th class="py-3 px-4 text-left">Site ID</th>
+                        <th class="py-3 px-4 text-left">Site Name</th>
+                        <th class="py-3 px-4 text-left">Service Area</th>
+                        <th class="py-3 px-4 text-left">STO</th>
+                        <th class="py-3 px-4 text-left">Product</th>
+                        <th class="py-3 px-4 text-left">Tikor</th>
+                        {{-- Kolom Aksi hanya muncul untuk admin dan master --}}
+                        @if(session('role') == 'admin' || session('role') == 'master')
+                            <th class="py-2 px-4 text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y">
@@ -64,13 +70,21 @@
                         <td class="py-2 px-4">{{ $site->sto }}</td>
                         <td class="py-2 px-4">{{ $site->product }}</td>
                         <td class="py-2 px-4">{{ $site->tikor }}</td>
+
+                        {{-- Tombol aksi hanya muncul untuk admin dan master --}}
+                        @if(session('role') == 'admin' || session('role') == 'master')
                         <td class="py-2 px-4 text-center flex justify-center gap-3">
-                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})"><i class="fas fa-pen"></i></button>
+                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})">
+                                <i class="fas fa-pen"></i>
+                            </button>
                             <form method="POST" action="{{ route('datasite.delete', $site->id) }}" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                 @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800 delete-btn" title="Hapus"><i class="fas fa-trash"></i></button>
+                                <button type="submit" class="text-red-600 hover:text-red-800 delete-btn" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>
@@ -79,6 +93,7 @@
     </div>
 
     {{-- =================== MODAL TAMBAH =================== --}}
+    @if(session('role') == 'admin' || session('role') == 'master')
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
             <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Site</h2>
@@ -86,7 +101,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Id</label>
-                    <input type="number" name="site_code" class="w-full border rounded-lg px-3 py-2" required min="1" step="1" pattern="[0-9]+">
+                    <input type="number" name="site_code" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Name</label>
@@ -132,8 +147,10 @@
             </form>
         </div>
     </div>
+    @endif
 
     {{-- =================== MODAL EDIT =================== --}}
+    @if(session('role') == 'admin' || session('role') == 'master')
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
             <h2 class="text-xl font-bold mb-4">Edit Site</h2>
@@ -142,7 +159,7 @@
                 <input type="hidden" name="_method" value="POST">
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Id</label>
-                    <input type="number" id="editSiteID" name="site_code" class="w-full border rounded-lg px-3 py-2" required min="1" step="1" pattern="[0-9]+">
+                    <input type="number" id="editSiteID" name="site_code" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Name</label>
@@ -187,10 +204,13 @@
             </form>
         </div>
     </div>
+    @endif
 
 </div>
 
 <script>
+    let sites = @json($sites);
+
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
         if (!site) return;
@@ -210,16 +230,17 @@
         document.getElementById('editModal').classList.remove('flex');
     }
 
-    window.onload = function() {
-        setTimeout(function() {
-            var notifSuccess = document.getElementById('notif-success');
-            if (notifSuccess) notifSuccess.style.display = 'none';
-            var notifError = document.getElementById('notif-error');
-            if (notifError) notifError.style.display = 'none';
-        }, 5000);
-    };
+    function openAddModal() {
+        const modal = document.getElementById('addModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 
-    let sites = @json($sites);
+    function closeAddModal() {
+        const modal = document.getElementById('addModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 
     function searchSiteId() {
         const input = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -248,35 +269,22 @@
                     <td class='py-2 px-4'>${site.sto}</td>
                     <td class='py-2 px-4'>${site.product}</td>
                     <td class='py-2 px-4'>${site.tikor}</td>
-                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
-                        <button class='text-blue-600 hover:text-blue-800 edit-btn' title='Edit' onclick='openEditModal(${site.id})'><i class='fas fa-pen'></i></button>
-                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit='return confirm("Yakin ingin menghapus data ini?")'>
-                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
-                            <button type='submit' class='text-red-600 hover:text-red-800 delete-btn' title='Hapus'><i class='fas fa-trash'></i></button>
-                        </form>
-                    </td>
                 </tr>
             `;
         });
-    }
-
-    renderTable(sites);
-
-    function openAddModal() {
-        const modal = document.getElementById('addModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-
-    function closeAddModal() {
-        const modal = document.getElementById('addModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
     }
 
     function clearSearch() {
         document.getElementById('searchInput').value = "";
         renderTable(sites);
     }
+
+    // Auto-hide notifikasi
+    window.onload = function() {
+        setTimeout(function() {
+            document.getElementById('notif-success')?.remove();
+            document.getElementById('notif-error')?.remove();
+        }, 5000);
+    };
 </script>
 @endsection
