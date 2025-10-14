@@ -29,12 +29,7 @@ class AdminController extends Controller
         $totalSites = DB::table('sites')->count();
 
         $totalVisit = DB::table('maintenances')->where('progres', 'Visit')->count();
-        $totalNotVisit = DB::table('sites')
-    ->join('maintenances', 'sites.id', '=', 'maintenances.site_id')
-    ->where('maintenances.progres', 'Belum Visit')
-    ->distinct('sites.id')
-    ->count('sites.id');
-
+        $totalNotVisit = DB::table('maintenances')->where('progres', 'Belum Visit')->count();
         $visitPercentage = $totalSites > 0
             ? round(($totalVisit / $totalSites) * 100, 2)
             : 0;
