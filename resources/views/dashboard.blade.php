@@ -21,7 +21,7 @@
                     @elseif ($growth < 0)
                         <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
                     @else
-                        <p class="{{ $color }} text-sm">Tidak ada perubahan</p>
+                        <p class="{{ $color }} text-sm">0 perubahan dari hari kemarin ini</p>
                     @endif
                 </div>
             </div>
@@ -32,8 +32,14 @@
                 <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $visitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
-                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
+                    <span class="material-symbols-outlined {{ $colorVisit }} text-sm">{{ $iconVisit }}</span>
+                    @if ($growthVisit > 0)
+                        <p class="{{ $colorVisit }} text-sm">+{{ $growthVisit }} dari hari kemarin</p>
+                    @elseif ($growthVisit < 0)
+                        <p class="{{ $colorVisit }} text-sm">{{ $growthVisit }} dari hari kemarin</p>
+                    @else
+                        <p class="{{ $colorVisit }} text-sm">0 perubahan dari hari kemarin</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -43,8 +49,14 @@
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
-                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
+                    <span class="material-symbols-outlined {{ $colorNotVisit }} text-sm">{{ $iconNotVisit }}</span>
+                    @if ($growthNotVisit > 0)
+                        <p class="{{ $colorNotVisit }} text-sm">+{{ $growthNotVisit }} dari hari kemarin</p>
+                    @elseif ($growthNotVisit < 0)
+                        <p class="{{ $colorNotVisit }} text-sm">{{ $growthNotVisit }} dari hari kemarin</p>
+                    @else
+                        <p class="{{ $colorNotVisit }} text-sm">0 perubahan dari hari kemarin</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -193,6 +205,50 @@
                                 {{ $row->keterangan }}
                             </td>
                         </tr>
+                        @if ($loop->last)
+                            @php
+                                // Total keseluruhan untuk setiap kolom
+                                $totalJumlahTeknisi = $summary->sum('jumlah_teknisi');
+                                $totalVisitedToday = $summary->sum('visited_today');
+                                $totalNotVisitFO = $summary->sum('notvisit_fo');
+                                $totalNotVisitMMP = $summary->sum('notvisit_mmp');
+                                $totalBelumAll = $summary->sum(function($row){
+                                    return $row->notvisit_fo + $row->notvisit_mmp;
+                                });
+                                $totalVisitedFO = $summary->sum('visited_fo');
+                                $totalVisitedMMP = $summary->sum('visited_mmp');
+                                $totalSudahAll = $summary->sum(function($row){
+                                    return $row->visited_fo + $row->visited_mmp;
+                                });
+                                $totalGrandFO = $summary->sum(function($row){
+                                    return $row->visited_fo + $row->notvisit_fo;
+                                });
+                                $totalGrandMMP = $summary->sum(function($row){
+                                    return $row->visited_mmp + $row->notvisit_mmp;
+                                });
+                                $totalGrandAll = $summary->sum('total');
+                                // Persentase total
+                                $totalPercent = $totalGrandAll > 0
+                                    ? number_format(($totalSudahAll / $totalGrandAll) * 100, 2)
+                                    : '0.00';
+                            @endphp
+                            <tr class="font-bold bg-blue-100">
+                                <td class="border px-2 py-2 text-center" colspan="2">TOTAL</td>
+                                <td class="border px-2 py-2 text-center">{{ $totalJumlahTeknisi }}</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">{{ $totalVisitedToday }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-200">{{ $totalNotVisitFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-200">{{ $totalNotVisitMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-300">{{ $totalBelumAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-200">{{ $totalVisitedFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-200">{{ $totalVisitedMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-300">{{ $totalSudahAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-200">{{ $totalGrandFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-200">{{ $totalGrandMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-300">{{ $totalGrandAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">{{ $totalPercent }}%</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">-</td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>

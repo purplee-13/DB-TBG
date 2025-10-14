@@ -107,6 +107,21 @@ class AdminController extends Controller
             $color = 'text-gray-700';
             $icon = 'trending_flat';
         }
+        //Visit TREND
+        $todayVisit = Site::where('progres', 'Sudah Visit')
+            ->whereDate('tgl_visit', Carbon::now()->toDateString())
+            ->count();
+        $yesterdayVisit = Site::where('progres', 'Sudah Visit')
+            ->whereDate('tgl_visit', Carbon::now()->subDay()->toDateString())
+            ->count();
+        $growthVisit = $todayVisit - $yesterdayVisit;
+        $growthNotVisit = $yesterdayVisit - $todayVisit;
+        $colorVisit = $growthVisit > 0 ? 'text-green-500' : ($growthVisit < 0 ? 'text-red-500' : 'text-gray-700');
+        $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
+        
+        $colorNotVisit = $growthNotVisit > 0 ? 'text-green-500' : ($growthNotVisit < 0 ? 'text-red-500' : 'text-gray-700');
+        $iconNotVisit = $growthNotVisit > 0 ? 'trending_up' : ($growthNotVisit < 0 ? 'trending_down' : 'trending_flat');
+    
 
         // === Data grafik per produk ===
         foreach ($products as $product) {
@@ -154,7 +169,12 @@ class AdminController extends Controller
             'growth' => $growth,
             'color' => $color,
             'icon' => $icon,
-          
+            'colorVisit' => $colorVisit,
+            'iconVisit' => $iconVisit,
+            'growthVisit' => $growthVisit,
+            'colorNotVisit' => $colorNotVisit,
+            'iconNotVisit' => $iconNotVisit,
+            'growthNotVisit' => $growthNotVisit,
         ]);
     }
 }
