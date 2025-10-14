@@ -140,11 +140,30 @@
                             $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
                             $sudahAll = $row->visited_fo + $row->visited_mmp;
                             $grandAll = $belumAll + $sudahAll;
-                            $persen = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
-                        @endphp
 
+                            // Mendapatkan key dan jumlah baris (rowspan) untuk merge service_area
+                            $currentServiceArea = $row->service_area;
+                            $printServiceArea = false;
+                            if (!isset($serviceAreaCounter)) $serviceAreaCounter = [];
+                            if (!isset($serviceAreaFirstRow)) $serviceAreaFirstRow = [];
+
+                            if (!array_key_exists($currentServiceArea, $serviceAreaCounter)) {
+                                // hitung berapa sto dalam summary untuk service area ini
+                                $serviceAreaCounter[$currentServiceArea] = $summary->where('service_area', $currentServiceArea)->count();
+                                // row ke berapa dari summary (dapatkan $loop->index dari baris service_area pertama)
+                                $serviceAreaFirstRow[$currentServiceArea] = $loop->index;
+                            }
+                            if ($loop->index === $serviceAreaFirstRow[$currentServiceArea]) {
+                                $printServiceArea = true;
+                                $rowspan = $serviceAreaCounter[$currentServiceArea];
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
+                            @if($printServiceArea)
+                                <td class="border px-2 py-1 font-semibold text-left" rowspan="{{ $rowspan }}">
+                                    {{ $row->service_area }}
+                                </td>
+                            @endif
                             <td class="border px-2 py-1">{{ $row->sto }}</td>
                             <td class="border px-2 py-1">{{ $row->jumlah_teknisi }}</td>
                             <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row->visited_today }}</td>
@@ -165,17 +184,13 @@
                             <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $grandAll }}</td>
 
                             <!-- Persentase -->
-                            @php
-                                $percent = $row->persen ?? 0;
-                                $color = $percent < 30 ? 'bg-red-200 text-red-700' : ($percent > 50 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
-                            @endphp
-                            <td class="border px-3 py-2 font-semibold {{ $color }}">
-                                {{ number_format($percent, 2) }}%
+                            <td class="border px-3 py-2 font-semibold
+                                {{ $row->percent == 0 ? 'bg-gray-200 text-gray-700' : ($row->percent == 100 ? 'bg-green-100 text-green-700' : 'bg-red-200 text-red-700') }}">
+                                {{ number_format($row->percent, 2) }}%
                             </td>
 
-                            {{-- Keterangan --}}
-                            <td class="border px-2 py-1 text-sm text-gray-700">
-                                {{ $persen < 30 ? 'Belum Terassign' : ($persen < 50 ? 'Progressing' : 'Achieved') }}
+                            <td class="border px-2 py-1 text-sm text-gray-700 {{ $row->percent == 0 ? 'bg-gray-200 text-gray-700' : ($row->percent == 100 ? 'bg-green-100 text-green-700 font-bold' : 'bg-red-200 text-red-700') }}">
+                                {{ $row->keterangan }}
                             </td>
                         </tr>
                     @endforeach
@@ -257,7 +272,7 @@
             const chart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Visit', 'Belum Visit'],
+                    labels: ['Sudah Visit', 'Belum Visit'],
                     datasets: [{
                         data: [visit, notVisit],
                         backgroundColor: ['#22c55e', '#ef4444']
@@ -278,7 +293,7 @@
                     <!-- Visit -->
                     <div class="flex items-center gap-1">
                         <span class="material-symbols-outlined text-green-500 text-sm">where_to_vote</span>
-                        <span class="font-medium text-xs">Visit: ${visit}</span>
+                        <span class="font-medium text-xs">Sudah Visit: ${visit}</span>
                         <span class="text-gray-400 text-xs"> ${((visit / total) * 100).toFixed(1)}%</span>
                     </div>
 

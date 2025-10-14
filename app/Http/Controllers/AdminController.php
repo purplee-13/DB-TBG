@@ -63,11 +63,30 @@ class AdminController extends Controller
         ->orderBy('sites.service_area')
         ->get();
 
-        $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
-        $sudahAll = $row->visited_fo + $row->visited_mmp;
-        $grandAll = $belumAll + $sudahAll;
+         // Hitung persentase & keterangan di controller
+        $summary = $summary->map(function ($item) {
+            $grandTotal = (int) $item->total;
+            $visited = (int) $item->visited_fo + (int) $item->visited_mmp;
 
-        $percent = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
+            // Hindari pembagian 0
+            $percent = $grandTotal > 0 ? ($visited / $grandTotal) * 100 : 0;
+
+            // Tentukan keterangan berdasarkan persentase
+            if ($percent == 100) {
+                $status = 'Achieved';
+            } elseif ($percent >= 0 && $percent <= 1) {
+                $status = 'Belum Terassign';
+            } elseif ($percent > 1 && $percent < 100) {
+                $status = 'Progressing';
+            } else {
+                $status = '-';
+            }
+
+            $item->percent = round($percent, 2);
+            $item->keterangan = $status;
+
+            return $item;
+        });
 
         // === Perbandingan dengan bulan lalu ===
         $lastMonth = Carbon::now()->subMonth();
@@ -135,6 +154,7 @@ class AdminController extends Controller
             'growth' => $growth,
             'color' => $color,
             'icon' => $icon,
+          
         ]);
     }
 }
