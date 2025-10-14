@@ -32,8 +32,8 @@
                 <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $visitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-green-500 text-sm">trending_up</span>
-                    <p class="text-green-500 text-sm">+1 dari hari kemarin</p>
+                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
+                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -43,8 +43,8 @@
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
-                    <p class="text-red-500 text-sm">-19 dari hari kemarin</p>
+                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
+                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -112,28 +112,26 @@
             <table class="min-w-full border border-gray-300 text-sm text-center">
                 <thead>
                     <tr class="bg-blue-900 text-white">
-                        <th class="border px-3 py-2">Service Area</th>
-                        <th class="border px-3 py-2">STO</th>
-                        <th class="border px-3 py-2">Jumlah Teknisi</th>
-                        <th class="border px-3 py-2">Progres HI</th>
-                        <th class="border px-3 py-2 bg-red-700" colspan="3">Belum Visit</th>
-                        <th class="border px-3 py-2 bg-green-700" colspan="3">Sudah Visit</th>
-                        <th class="border px-3 py-2 bg-gray-700" colspan="3">Grand Total</th>
-                        <th class="border px-3 py-2">%</th>
-                        <th class="border px-3 py-2">Keterangan</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">Service Area</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">STO</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">Jumlah Teknisi</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">Progres HI</th>
+                        <th colspan="3" class="border px-3 py-2 bg-red-700">Belum Visit</th>
+                        <th colspan="3" class="border px-3 py-2 bg-green-700">Sudah Visit</th>
+                        <th colspan="3" class="border px-3 py-2 bg-gray-700">Grand Total</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">%</th>
+                        <th rowspan="2" class="border px-3 py-2 align-middle">Keterangan</th>
                     </tr>
-                    <tr class="bg-gray-100 font-semibold text-gray-700">
-                        <th colspan="4"></th>
-                        <th class="border px-2 py-1">IN FO</th>
-                        <th class="border px-2 py-1">MMP</th>
-                        <th class="border px-2 py-1">ALL</th>
-                        <th class="border px-2 py-1">IN FO</th>
-                        <th class="border px-2 py-1">MMP</th>
-                        <th class="border px-2 py-1">ALL</th>
-                        <th class="border px-2 py-1">IN FO</th>
-                        <th class="border px-2 py-1">MMP</th>
-                        <th class="border px-2 py-1">ALL</th>
-                        <th colspan="2"></th>
+                    <tr class=" font-semibold text-white">
+                        <th class="border px-2 py-1 bg-red-700">IN FO</th>
+                        <th class="border px-2 py-1 bg-red-700">MMP</th>
+                        <th class="border px-2 py-1 bg-red-700">ALL</th>
+                        <th class="border px-2 py-1 bg-green-700">IN FO</th>
+                        <th class="border px-2 py-1 bg-green-700">MMP</th>
+                        <th class="border px-2 py-1 bg-green-700">ALL</th>
+                        <th class="border px-2 py-1 bg-gray-700">IN FO</th>
+                        <th class="border px-2 py-1 bg-gray-700">MMP</th>
+                        <th class="border px-2 py-1 bg-gray-700">ALL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,8 +146,8 @@
                         <tr class="hover:bg-gray-50">
                             <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
                             <td class="border px-2 py-1">{{ $row->sto }}</td>
-                            <td class="border px-2 py-1">-</td> {{-- Jumlah Teknisi (belum ada data di DB) --}}
-                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">-</td>
+                            <td class="border px-2 py-1">{{ $row->jumlah_teknisi }}</td>
+                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row->visited_today }}</td>
 
                             {{-- Belum Visit --}}
                             <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_fo }}</td>
@@ -166,14 +164,18 @@
                             <td class="border px-2 py-1 bg-gray-100">{{ $row->visited_mmp + $row->notvisit_mmp }}</td>
                             <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $grandAll }}</td>
 
-                            {{-- Persentase --}}
-                            <td class="border px-2 py-1 font-bold {{ $persen > 30 ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white' }}">
-                                {{ $persen }}%
+                            <!-- Persentase -->
+                            @php
+                                $percent = $row->persen ?? 0;
+                                $color = $percent < 30 ? 'bg-red-200 text-red-700' : ($percent > 50 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
+                            @endphp
+                            <td class="border px-3 py-2 font-semibold {{ $color }}">
+                                {{ number_format($percent, 2) }}%
                             </td>
 
                             {{-- Keterangan --}}
                             <td class="border px-2 py-1 text-sm text-gray-700">
-                                {{ $persen < 30 ? 'Belum Terassign' : 'Progressing' }}
+                                {{ $persen < 30 ? 'Belum Terassign' : ($persen < 50 ? 'Progressing' : 'Achieved') }}
                             </td>
                         </tr>
                     @endforeach

@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sites', function (Blueprint $table) {
-            $table->string('month_reference')->nullable()->after('tikor');
+        Schema::create('technicians', function (Blueprint $table) {
+            $table->id();
+            $table->string('sto')->unique(); // kode STO
+            $table->integer('jumlah_teknisi')->default(0);
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sites', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('technicians');
     }
 };
