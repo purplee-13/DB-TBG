@@ -35,6 +35,12 @@ class SiteSeeder extends Seeder
             $sto = $row['D'] ?? null;
             $product = $row['E'] ?? null;
             $tikor = $row['F'] ?? null;
+            $teknisi = $row['G'] ?? null;
+            $tglVisit = $row['H'] ?? null;
+            $keterangan = $row['I'] ?? null;
+            $progres = $row['J'] ?? null;
+            $operator = $row['K'] ?? null;
+            $monthReference = $row['L'] ?? null;
 
             if ($siteCode && $siteName && $product) {
 

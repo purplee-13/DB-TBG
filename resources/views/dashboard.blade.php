@@ -146,8 +146,8 @@
                         <tr class="hover:bg-gray-50">
                             <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
                             <td class="border px-2 py-1">{{ $row->sto }}</td>
-                            <td class="border px-2 py-1">-</td> {{-- Jumlah Teknisi (belum ada data di DB) --}}
-                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">-</td>
+                            <td class="border px-2 py-1">{{ $row->jumlah_teknisi }}</td>
+                            <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row->visited_today }}</td>
 
                             {{-- Belum Visit --}}
                             <td class="border px-2 py-1 bg-red-100 text-red-700">{{ $row->notvisit_fo }}</td>

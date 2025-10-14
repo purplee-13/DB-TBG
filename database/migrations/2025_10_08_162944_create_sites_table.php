@@ -16,6 +16,12 @@ return new class extends Migration
             $table->string('sto');
             $table->enum('product', ['INTERSITE FO', 'MMP']);
             $table->string('tikor')->nullable();
+            $table->string('teknisi')->nullable();
+            $table->text('keterangan')->nullable();
+            $table->date('tgl_visit')->nullable();
+            $table->enum('progres', ['Sudah Visit', 'Belum Visit'])->default('Belum Visit');
+            $table->string('operator')->nullable();
+            $table->string('month_reference')->nullable();
             $table->timestamps();
         });
     }

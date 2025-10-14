@@ -3,7 +3,7 @@
         <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10">
         <div class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-[#022CB8]">calendar_clock</span>
-                <p class="text-sm text-[#022CB8]">Sel, 7 Oktober 2025, <span id="current-time"></span></p>
+                <p class="text-sm text-[#022CB8]"><span id="current-date"></span>, <span id="current-time"></span></p>
             </div>
     </div>
 

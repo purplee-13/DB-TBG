@@ -19,10 +19,12 @@ class Site extends Model
         'sto',
         'product',
         'tikor',
+        'teknisi',
+        'tgl_visit',
+        'keterangan',
+        'progres',
+        'operator',
+        'month_reference',
     ];
 
-    public function maintenances()
-    {
-        return $this->hasMany(Maintenance::class, 'site_id');
-    }
 }
