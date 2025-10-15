@@ -21,7 +21,7 @@
                     @elseif ($growth < 0)
                         <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
                     @else
-                        <p class="{{ $color }} text-sm">0 perubahan dari hari kemarin ini</p>
+                        <p class="{{ $color }} text-sm">0 dari hari kemarin ini</p>
                     @endif
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     @elseif ($growthVisit < 0)
                         <p class="{{ $colorVisit }} text-sm">{{ $growthVisit }} dari hari kemarin</p>
                     @else
-                        <p class="{{ $colorVisit }} text-sm">0 perubahan dari hari kemarin</p>
+                        <p class="{{ $colorVisit }} text-sm">0 dari hari kemarin</p>
                     @endif
                 </div>
             </div>
@@ -261,8 +261,8 @@
         const daysInMonth = @json($daysInMonth);
         const ctx = document.getElementById('trendChart').getContext('2d');
         const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientBlue.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
-        gradientBlue.addColorStop(1, 'rgba(37, 99, 235, 0.05)');
+        gradientBlue.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradientBlue.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
 
         new Chart(ctx, {
             type: 'line',
@@ -273,7 +273,6 @@
                         label: 'Jumlah Visit per Hari',
                         data: visitData,
                         borderColor: '#2563EB',
-                        backgroundColor: gradientBlue,
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,

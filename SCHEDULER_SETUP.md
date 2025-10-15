@@ -57,6 +57,7 @@ php artisan schedule:run
 2. **Resets them to**:
    - `progres = 'Belum Visit'`
    - `tgl_visit = null`
+   - `keterangan = null`
    - `updated_at = current timestamp`
 3. **Logs the action** in Laravel logs
 4. **Prevents overlapping** runs for safety

@@ -34,6 +34,7 @@ class ResetProgressMonthly extends Command
             ->update([
                 'progres' => 'Belum Visit',
                 'tgl_visit' => null,
+                'keterangan' => null,
                 'updated_at' => Carbon::now()
             ]);
 

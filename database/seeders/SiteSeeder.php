@@ -52,6 +52,12 @@ class SiteSeeder extends Seeder
                         'sto' => $sto,
                         'product' => $product,
                         'tikor' => $tikor,
+                        'teknisi' => $teknisi,
+                        'tgl_visit' => $tglVisit,
+                        'keterangan' => $keterangan,
+                        'progres' => $progres,
+                        'operator' => $operator,
+                        'month_reference' => $monthReference,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]
