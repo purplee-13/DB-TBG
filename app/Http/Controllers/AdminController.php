@@ -133,8 +133,6 @@ class AdminController extends Controller
         $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
 
         $growthNotVisit = $todayVisit;
-        $colorNotVisit = $growthNotVisit > 0 ? 'text-green-500' : ($growthNotVisit < 0 ? 'text-red-500' : 'text-gray-700');
-        $iconNotVisit = $growthNotVisit > 0 ? 'trending_up' : ($growthNotVisit < 0 ? 'trending_down' : 'trending_flat');
 
         // Data grafik per produk
         foreach ($products as $product) {
@@ -186,8 +184,6 @@ class AdminController extends Controller
             'colorVisit' => $colorVisit,
             'iconVisit' => $iconVisit,
             'growthVisit' => $growthVisit,
-            'colorNotVisit' => $colorNotVisit,
-            'iconNotVisit' => $iconNotVisit,
             'growthNotVisit' => $growthNotVisit,
             'selectedServiceArea' => $serviceArea,
             'selectedSto' => $sto,

@@ -49,14 +49,8 @@
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined {{ $colorNotVisit }} text-sm">{{ $iconNotVisit }}</span>
-                    @if ($growthNotVisit > 0)
-                        <p class="{{ $colorNotVisit }} text-sm">+{{ $growthNotVisit }} dari hari kemarin</p>
-                    @elseif ($growthNotVisit < 0)
-                        <p class="{{ $colorNotVisit }} text-sm">{{ $growthNotVisit }} dari hari kemarin</p>
-                    @else
-                        <p class="{{ $colorNotVisit }} text-sm">0 perubahan dari hari kemarin</p>
-                    @endif
+                    <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
+                        <p class="text-red-500 text-sm">-{{ $growthNotVisit }} dari hari kemarin</p>
                 </div>
             </div>
         </div>
