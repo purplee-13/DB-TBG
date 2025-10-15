@@ -115,9 +115,15 @@ class AdminController extends Controller
             ->whereDate('tgl_visit', Carbon::now()->subDay()->toDateString())
             ->count();
         $growthVisit = $todayVisit - $yesterdayVisit;
-        $growthNotVisit = $yesterdayVisit - $todayVisit;
         $colorVisit = $growthVisit > 0 ? 'text-green-500' : ($growthVisit < 0 ? 'text-red-500' : 'text-gray-700');
         $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
+        $yesterdayNotVisit = Site::where('progres', 'Belum Visit')
+            ->whereDate('tgl_visit', Carbon::now()->subDay()->toDateString())
+            ->count();
+        $todayNotVisit = Site::where('progres', 'Belum Visit')
+            ->whereDate('tgl_visit', Carbon::now()->toDateString())
+            ->count();
+        $growthNotVisit = $todayNotVisit - $yesterdayNotVisit;
         
         $colorNotVisit = $growthNotVisit > 0 ? 'text-green-500' : ($growthNotVisit < 0 ? 'text-red-500' : 'text-gray-700');
         $iconNotVisit = $growthNotVisit > 0 ? 'trending_up' : ($growthNotVisit < 0 ? 'trending_down' : 'trending_flat');
