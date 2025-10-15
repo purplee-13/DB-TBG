@@ -44,6 +44,7 @@
                 <thead class="bg-blue-600 text-white" style="position:sticky;top:0;z-index:2;">
                     <tr>
                         <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">NO</th>
+                        <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;"><input type="checkbox" id="selectAll"></th>
                         <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site ID</th>
                         <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Site Name</th>
                         <th class="py-3 px-4 text-left" style="position:sticky;top:0;z-index:3;background-color:#2563eb;color:white;">Service Area</th>
@@ -57,6 +58,7 @@
                     @foreach ($sites as $index => $site)
                     <tr>
                         <td class="py-2 px-4">{{ $index + 1 }}</td>
+                        <td class="py-2 px-4"><input type="checkbox" class="row-checkbox" value="{{ $site->id }}"></td>
                         <td class="py-2 px-4">{{ $site->site_code }}</td>
                         <td class="py-2 px-4">{{ $site->site_name }}</td>
                         <td class="py-2 px-4">{{ $site->service_area }}</td>
@@ -75,6 +77,10 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div class="flex justify-end mt-3">
+        <button id="bulkDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Hapus Terpilih</button>
     </div>
 
     {{-- Modal Tambah/Edit Site --}}
@@ -220,6 +226,7 @@
         }, 5000);
     };
     let sites = @json($sites);
+    const csrfToken = '{{ csrf_token() }}';
 
     function searchSiteId() {
         const input = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -243,6 +250,7 @@
             tableBody.innerHTML += `
                 <tr>
                     <td class='py-2 px-4'>${index + 1}</td>
+                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                     <td class='py-2 px-4'>${site.site_code}</td>
                     <td class='py-2 px-4'>${site.site_name}</td>
                     <td class='py-2 px-4'>${site.service_area}</td>
@@ -252,13 +260,57 @@
                     <td class='py-2 px-4 text-center flex justify-center gap-3'>
                         <button class='text-blue-600 hover:text-blue-800 edit-btn' title='Edit' onclick='openEditModal(${site.id})'><i class='fas fa-pen'></i></button>
                         <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit='return confirm("Yakin ingin menghapus data ini?")'>
-                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                            <input type='hidden' name='_token' value='${""+csrfToken}'>
                             <button type='submit' class='text-red-600 hover:text-red-800 delete-btn' title='Hapus'><i class='fas fa-trash'></i></button>
                         </form>
                     </td>
                 </tr>
             `;
         });
+
+        // Re-bind selectAll behavior for dynamic rows
+        const selectAll = document.getElementById('selectAll');
+        if (selectAll) {
+            selectAll.checked = false;
+            selectAll.addEventListener('change', function() {
+                const checked = this.checked;
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+            });
+        }
+
+        // Bulk delete button
+        const bulkBtn = document.getElementById('bulkDeleteBtn');
+        if (bulkBtn) {
+            bulkBtn.addEventListener('click', async function() {
+                const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+                if (selected.length === 0) {
+                    alert('Pilih minimal satu data untuk dihapus.');
+                    return;
+                }
+                if (!confirm('Yakin ingin menghapus ' + selected.length + ' data terpilih?')) return;
+
+                try {
+                    const res = await fetch('{{ route('datasite.deleteMultiple') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ids: selected })
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        location.reload();
+                    } else {
+                        alert(json.message || 'Terjadi kesalahan saat menghapus.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Gagal menghapus data. Cek console untuk detail.');
+                }
+            });
+        }
     }
 
     // Render awal semua data

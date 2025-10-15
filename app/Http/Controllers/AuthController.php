@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -9,16 +8,16 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // 🔹 Menampilkan form login
+    // Menampilkan form login
     public function showLoginForm()
     {
         return view('login');
     }
 
-    // 🔹 Proses login
+    // Proses login
     public function processLogin(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'username' => 'required',
             'password' => [
                 'required',

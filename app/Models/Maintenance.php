@@ -20,6 +20,10 @@ class Maintenance extends Model
         'operator',
     ];
 
+    protected $casts = [
+        'tngl_visit' => 'date',
+    ];
+
     public function site()
     {
         return $this->belongsTo(Site::class, 'site_id');

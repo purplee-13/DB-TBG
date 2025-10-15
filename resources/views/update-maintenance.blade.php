@@ -3,6 +3,20 @@
 @section('content')
 <div class="p-6">
 
+    {{-- Notifikasi --}}
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Search Bar --}}
     <div class="flex justify-end items-center mb-4">
         <div class="relative">
@@ -34,46 +48,46 @@
                 </tr>
             </thead>
             <tbody class="divide-y">
-                @php
-                    $maintenance = [
-                        ['id'=>'2814082004','name'=>'Site Name IBS Tanete_Rilau','teknisi'=>'AKBAR','tgl'=>'06/10/2025','progres'=>'Sudah Visit','operator'=>'H3I','ket'=>'Done'],
-                        ['id'=>'2814092004','name'=>'IBS Palandro_Mallusetasi','teknisi'=>'AKBAR','tgl'=>'06/10/2025','progres'=>'Sudah Visit','operator'=>'Smartfren','ket'=>'Done'],
-                        ['id'=>'2815062001','name'=>'IBS Mangkoso','teknisi'=>'AKBAR','tgl'=>'06/10/2025','progres'=>'Belum Visit','operator'=>'H3I','ket'=>'Done'],
-                        ['id'=>'2815242004','name'=>'IBS Pelabuhan Awerange','teknisi'=>'AKBAR','tgl'=>'06/10/2025','progres'=>'Belum Visit','operator'=>'Indosat','ket'=>'Done'],
-                        ['id'=>'2817331004','name'=>'PALAKKA BARRU','teknisi'=>'AKBAR','tgl'=>'06/10/2025','progres'=>'Belum Visit','operator'=>'Indosat','ket'=>'Tidak Ada Jaringan di Site'],
-                    ];
-                @endphp
-
-                @foreach ($maintenance as $index => $m)
+                @foreach ($sites as $index => $site)
+                    @php
+                        $last = $site->maintenances->first();
+                        // format date for display
+                        $tgl = $last && $last->tngl_visit ? $last->tngl_visit->format('d/m/Y') : '-';
+                        $teknisi = $last->teknisi ?? '';
+                        $progres = $last->progres ?? 'Belum Visit';
+                        $operator = $last->operator ?? '';
+                        $keterangan = $last->keterangan ?? '';
+                    @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="py-2 px-4">{{ $index + 1 }}</td>
-                        <td class="py-2 px-4">{{ $m['id'] }}</td>
-                        <td class="py-2 px-4">{{ $m['name'] }}</td>
-                        <td class="py-2 px-4">{{ $m['teknisi'] }}</td>
-                        <td class="py-2 px-4">{{ $m['tgl'] }}</td>
+                        <td class="py-2 px-4">{{ $site->site_code }}</td>
+                        <td class="py-2 px-4">{{ $site->site_name }}</td>
+                        <td class="py-2 px-4">{{ $teknisi }}</td>
+                        <td class="py-2 px-4">{{ $tgl }}</td>
                         <td class="py-2 px-4">
-                            @if($m['progres'] == 'Sudah Visit')
+                            @if($progres == 'Visit')
                                 <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                    {{ $m['progres'] }}
+                                    {{ $progres }}
                                 </span>
                             @else
                                 <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                    {{ $m['progres'] }}
+                                    {{ $progres }}
                                 </span>
                             @endif
                         </td>
-                        <td class="py-2 px-4">{{ $m['operator'] }}</td>
-                        <td class="py-2 px-4">{{ $m['ket'] }}</td>
+                        <td class="py-2 px-4">{{ $operator }}</td>
+                        <td class="py-2 px-4">{{ $keterangan }}</td>
                         <td class="py-2 px-4 text-center">
                             <button 
-                                class="text- blue-600 hover:text-blue-800 edit-btn"
-                                data-id="{{ $m['id'] }}"
-                                data-name="{{ $m['name'] }}"
-                                data-teknisi="{{ $m['teknisi'] }}"
-                                data-tgl="{{ $m['tgl'] }}"
-                                data-progres="{{ $m['progres'] }}"
-                                data-operator="{{ $m['operator'] }}"
-                                data-ket="{{ $m['ket'] }}"
+                                class="text-blue-600 hover:text-blue-800 edit-btn"
+                                data-id="{{ $site->id }}"
+                                data-code="{{ $site->site_code }}"
+                                data-name="{{ $site->site_name }}"
+                                data-teknisi="{{ $teknisi }}"
+                                data-tgl="{{ $last && $last->tngl_visit ? $last->tngl_visit->format('Y-m-d') : '' }}"
+                                data-progres="{{ $progres }}"
+                                data-operator="{{ $operator }}"
+                                data-ket="{{ $keterangan }}"
                                 title="Edit">
                                 <i class="fas fa-pen"></i>
                             </button>
@@ -89,10 +103,12 @@
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-semibold mb-4 text-blue-600">Edit Data Site</h2>
-        <form>
+        <form method="POST" action="{{ route('update-maintenance.store') }}">
+            @csrf
             <div class="mb-3">
                 <label class="block text-sm font-medium">Site ID</label>
                 <input type="text" id="editSiteId" class="w-full border rounded px-3 py-2" readonly>
+                <input type="hidden" id="editSiteHiddenId" name="site_id">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Site Name</label>
@@ -100,26 +116,26 @@
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Teknisi</label>
-                <input type="text" id="editTeknisi" class="w-full border rounded px-3 py-2">
+                <input type="text" id="editTeknisi" name="teknisi" class="w-full border rounded px-3 py-2">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Tanggal Visit</label>
-                <input type="date" id="editTglVisit" class="w-full border rounded px-3 py-2">
+                <input type="date" id="editTglVisit" name="tngl_visit" class="w-full border rounded px-3 py-2">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Progres</label>
-                <select id="editProgres" class="w-full border rounded px-3 py-2">
-                    <option value="Sudah Visit">Sudah Visit</option>
+                <select id="editProgres" name="progres" class="w-full border rounded px-3 py-2">
+                    <option value="Visit">Visit</option>
                     <option value="Belum Visit">Belum Visit</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Operator</label>
-                <input type="text" id="editOperator" class="w-full border rounded px-3 py-2">
+                <input type="text" id="editOperator" name="operator" class="w-full border rounded px-3 py-2">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Keterangan</label>
-                <textarea id="editKeterangan" rows="2" class="w-full border rounded px-3 py-2"></textarea>
+                <textarea id="editKeterangan" name="keterangan" rows="2" class="w-full border rounded px-3 py-2"></textarea>
             </div>
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
@@ -147,13 +163,20 @@
     // Open Modal & Fill Data
     editBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            siteIdField.value = btn.dataset.id;
+            siteIdField.value = btn.dataset.code || btn.dataset.id;
+            document.getElementById('editSiteHiddenId').value = btn.dataset.id;
             siteNameField.value = btn.dataset.name;
-            teknisiField.value = btn.dataset.teknisi;
-            tglField.value = btn.dataset.tgl.split('/').reverse().join('-'); // convert ke format yyyy-mm-dd
-            progresField.value = btn.dataset.progres;
-            operatorField.value = btn.dataset.operator;
-            ketField.value = btn.dataset.ket;
+            teknisiField.value = btn.dataset.teknisi || '';
+            // Accept either dd/mm/yyyy or yyyy-mm-dd in data attribute
+            const rawDate = btn.dataset.tgl || '';
+            if (rawDate.includes('/')) {
+                tglField.value = rawDate.split('/').reverse().join('-'); // dd/mm/yyyy -> yyyy-mm-dd
+            } else {
+                tglField.value = rawDate; // already yyyy-mm-dd or empty
+            }
+            progresField.value = btn.dataset.progres || 'Belum Visit';
+            operatorField.value = btn.dataset.operator || '';
+            ketField.value = btn.dataset.ket || '';
 
             editModal.classList.remove('hidden');
             editModal.classList.add('flex');

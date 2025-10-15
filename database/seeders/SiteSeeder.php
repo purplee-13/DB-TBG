@@ -37,6 +37,7 @@ class SiteSeeder extends Seeder
             $tikor = $row['F'] ?? null;
 
             if ($siteCode && $siteName && $product) {
+
                 DB::table('sites')->updateOrInsert(
                     ['site_code' => $siteCode],
                     [
