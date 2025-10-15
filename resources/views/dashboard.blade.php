@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
-                <x-service-sto-dropdown />
+            <x-service-sto-dropdown :selectedServiceArea="$selectedServiceArea" :selectedSto="$selectedSto" />
         </div>
     </div>
 
@@ -80,7 +80,7 @@
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl text- font-bold text-white">9</p>
+                            <p class="text-3xl text- font-bold text-white">8</p>
                         </div>
                     </div>
                     
