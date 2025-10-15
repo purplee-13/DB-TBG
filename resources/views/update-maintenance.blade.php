@@ -43,7 +43,9 @@
                     <th class="py-3 px-4 text-left">Progres</th>
                     <th class="py-3 px-4 text-left">Operator</th>
                     <th class="py-3 px-4 text-left">Keterangan</th>
+                    @if(session('role') == 'admin' || session('role') == 'master')
                     <th class="py-3 px-4 text-center">Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y">
@@ -67,6 +69,7 @@
                         </td>
                         <td class="py-2 px-4">{{ $site->operator ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $site->keterangan ?? '-' }}</td>
+                        @if(session('role') == 'admin' || session('role') == 'master')
                         <td class="py-2 px-4 text-center">
                             <button 
                                 class="text- blue-600 hover:text-blue-800 edit-btn"
@@ -82,6 +85,7 @@
                                 <i class="fas fa-pen"></i>
                             </button>
                         </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
@@ -91,6 +95,7 @@
 </div>
 
 {{-- Modal Edit --}}
+@if(session('role') == 'admin' || session('role') == 'master')
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-semibold mb-4 text-blue-600">Edit Data Site</h2>
@@ -135,6 +140,7 @@
         </form>
     </div>
 </div>
+@endif
 
 <script>
     // Elements
@@ -152,41 +158,43 @@
     const operatorField = document.getElementById('editOperator');
     const ketField = document.getElementById('editKeterangan');
 
-    // Open Modal & Fill Data
-    editBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update form action with correct site ID
-            editForm.action = editForm.action.replace(/\/\d+$/, '/' + btn.dataset.id);
-            
-            siteIdField.value = btn.dataset.siteCode;
-            siteNameField.value = btn.dataset.siteName;
-            teknisiField.value = btn.dataset.teknisi || '';
-            // Convert date format from dd/mm/yyyy to yyyy-mm-dd
-            if (btn.dataset.tgl) {
-                tglField.value = btn.dataset.tgl.split('/').reverse().join('-');
-            } else {
-                tglField.value = '';
-            }
-            progresField.value = btn.dataset.progres;
-            operatorField.value = btn.dataset.operator || '';
-            ketField.value = btn.dataset.ket || '';
+    // Open Modal & Fill Data (only if modal exists)
+    if (editForm && editModal && closeModalBtn) {
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update form action with correct site ID
+                editForm.action = editForm.action.replace(/\/\d+$/, '/' + btn.dataset.id);
+                
+                siteIdField.value = btn.dataset.siteCode;
+                siteNameField.value = btn.dataset.siteName;
+                teknisiField.value = btn.dataset.teknisi || '';
+                // Convert date format from dd/mm/yyyy to yyyy-mm-dd
+                if (btn.dataset.tgl) {
+                    tglField.value = btn.dataset.tgl.split('/').reverse().join('-');
+                } else {
+                    tglField.value = '';
+                }
+                progresField.value = btn.dataset.progres;
+                operatorField.value = btn.dataset.operator || '';
+                ketField.value = btn.dataset.ket || '';
 
-            editModal.classList.remove('hidden');
-            editModal.classList.add('flex');
+                editModal.classList.remove('hidden');
+                editModal.classList.add('flex');
+            });
         });
-    });
 
-    // Close Modal
-    closeModalBtn.addEventListener('click', () => {
-        editModal.classList.add('hidden');
-    });
-
-    // Close modal if click outside
-    window.addEventListener('click', (e) => {
-        if (e.target === editModal) {
+        // Close Modal
+        closeModalBtn.addEventListener('click', () => {
             editModal.classList.add('hidden');
-        }
-    });
+        });
+
+        // Close modal if click outside
+        window.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.classList.add('hidden');
+            }
+        });
+    }
 
     // Search functionality
     const searchInput = document.getElementById('searchInput');
