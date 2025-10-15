@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
-                <x-service-sto-dropdown />
+            <x-service-sto-dropdown :selectedServiceArea="$selectedServiceArea" :selectedSto="$selectedSto" />
         </div>
     </div>
 
@@ -21,7 +21,7 @@
                     @elseif ($growth < 0)
                         <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
                     @else
-                        <p class="{{ $color }} text-sm">Tidak ada perubahan</p>
+                        <p class="{{ $color }} text-sm">0 dari hari kemarin ini</p>
                     @endif
                 </div>
             </div>
@@ -32,8 +32,14 @@
                 <h3 class="text-[#022CB8] font-semibold">SUDAH VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $visitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
-                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
+                    <span class="material-symbols-outlined {{ $colorVisit }} text-sm">{{ $iconVisit }}</span>
+                    @if ($growthVisit > 0)
+                        <p class="{{ $colorVisit }} text-sm">+{{ $growthVisit }} dari hari kemarin</p>
+                    @elseif ($growthVisit < 0)
+                        <p class="{{ $colorVisit }} text-sm">{{ $growthVisit }} dari hari kemarin</p>
+                    @else
+                        <p class="{{ $colorVisit }} text-sm">0 dari hari kemarin</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -43,8 +49,8 @@
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-gray-500 text-sm">trending_flat</span>
-                    <p class="text-gray-500 text-sm">Tidak ada perubahan dari hari kemarin</p>
+                    <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
+                        <p class="text-red-500 text-sm">-{{ $growthNotVisit }} dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -68,7 +74,7 @@
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl text- font-bold text-white">9</p>
+                            <p class="text-3xl text- font-bold text-white">8</p>
                         </div>
                     </div>
                     
@@ -140,11 +146,30 @@
                             $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
                             $sudahAll = $row->visited_fo + $row->visited_mmp;
                             $grandAll = $belumAll + $sudahAll;
-                            $persen = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
-                        @endphp
 
+                            // Mendapatkan key dan jumlah baris (rowspan) untuk merge service_area
+                            $currentServiceArea = $row->service_area;
+                            $printServiceArea = false;
+                            if (!isset($serviceAreaCounter)) $serviceAreaCounter = [];
+                            if (!isset($serviceAreaFirstRow)) $serviceAreaFirstRow = [];
+
+                            if (!array_key_exists($currentServiceArea, $serviceAreaCounter)) {
+                                // hitung berapa sto dalam summary untuk service area ini
+                                $serviceAreaCounter[$currentServiceArea] = $summary->where('service_area', $currentServiceArea)->count();
+                                // row ke berapa dari summary (dapatkan $loop->index dari baris service_area pertama)
+                                $serviceAreaFirstRow[$currentServiceArea] = $loop->index;
+                            }
+                            if ($loop->index === $serviceAreaFirstRow[$currentServiceArea]) {
+                                $printServiceArea = true;
+                                $rowspan = $serviceAreaCounter[$currentServiceArea];
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-1 font-semibold text-left">{{ $row->service_area }}</td>
+                            @if($printServiceArea)
+                                <td class="border px-2 py-1 font-semibold text-left" rowspan="{{ $rowspan }}">
+                                    {{ $row->service_area }}
+                                </td>
+                            @endif
                             <td class="border px-2 py-1">{{ $row->sto }}</td>
                             <td class="border px-2 py-1">{{ $row->jumlah_teknisi }}</td>
                             <td class="border px-2 py-1 bg-blue-100 font-bold text-blue-800">{{ $row->visited_today }}</td>
@@ -165,19 +190,59 @@
                             <td class="border px-2 py-1 bg-gray-200 font-semibold">{{ $grandAll }}</td>
 
                             <!-- Persentase -->
-                            @php
-                                $percent = $row->persen ?? 0;
-                                $color = $percent < 30 ? 'bg-red-200 text-red-700' : ($percent > 50 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
-                            @endphp
-                            <td class="border px-3 py-2 font-semibold {{ $color }}">
-                                {{ number_format($percent, 2) }}%
+                            <td class="border px-3 py-2 font-semibold
+                                {{ $row->percent == 0 ? 'bg-gray-200 text-gray-700' : ($row->percent == 100 ? 'bg-green-100 text-green-700' : 'bg-red-200 text-red-700') }}">
+                                {{ number_format($row->percent, 2) }}%
                             </td>
 
-                            {{-- Keterangan --}}
-                            <td class="border px-2 py-1 text-sm text-gray-700">
-                                {{ $persen < 30 ? 'Belum Terassign' : ($persen < 50 ? 'Progressing' : 'Achieved') }}
+                            <td class="border px-2 py-1 text-sm text-gray-700 {{ $row->percent == 0 ? 'bg-gray-200 text-gray-700' : ($row->percent == 100 ? 'bg-green-100 text-green-700 font-bold' : 'bg-red-200 text-red-700') }}">
+                                {{ $row->keterangan }}
                             </td>
                         </tr>
+                        @if ($loop->last)
+                            @php
+                                // Total keseluruhan untuk setiap kolom
+                                $totalJumlahTeknisi = $summary->sum('jumlah_teknisi');
+                                $totalVisitedToday = $summary->sum('visited_today');
+                                $totalNotVisitFO = $summary->sum('notvisit_fo');
+                                $totalNotVisitMMP = $summary->sum('notvisit_mmp');
+                                $totalBelumAll = $summary->sum(function($row){
+                                    return $row->notvisit_fo + $row->notvisit_mmp;
+                                });
+                                $totalVisitedFO = $summary->sum('visited_fo');
+                                $totalVisitedMMP = $summary->sum('visited_mmp');
+                                $totalSudahAll = $summary->sum(function($row){
+                                    return $row->visited_fo + $row->visited_mmp;
+                                });
+                                $totalGrandFO = $summary->sum(function($row){
+                                    return $row->visited_fo + $row->notvisit_fo;
+                                });
+                                $totalGrandMMP = $summary->sum(function($row){
+                                    return $row->visited_mmp + $row->notvisit_mmp;
+                                });
+                                $totalGrandAll = $summary->sum('total');
+                                // Persentase total
+                                $totalPercent = $totalGrandAll > 0
+                                    ? number_format(($totalSudahAll / $totalGrandAll) * 100, 2)
+                                    : '0.00';
+                            @endphp
+                            <tr class="font-bold bg-blue-100">
+                                <td class="border px-2 py-2 text-center" colspan="2">TOTAL</td>
+                                <td class="border px-2 py-2 text-center">{{ $totalJumlahTeknisi }}</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">{{ $totalVisitedToday }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-200">{{ $totalNotVisitFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-200">{{ $totalNotVisitMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-red-300">{{ $totalBelumAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-200">{{ $totalVisitedFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-200">{{ $totalVisitedMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-green-300">{{ $totalSudahAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-200">{{ $totalGrandFO }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-200">{{ $totalGrandMMP }}</td>
+                                <td class="border px-2 py-2 text-center bg-gray-300">{{ $totalGrandAll }}</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">{{ $totalPercent }}%</td>
+                                <td class="border px-2 py-2 text-center bg-blue-200">-</td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>
@@ -190,8 +255,8 @@
         const daysInMonth = @json($daysInMonth);
         const ctx = document.getElementById('trendChart').getContext('2d');
         const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientBlue.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
-        gradientBlue.addColorStop(1, 'rgba(37, 99, 235, 0.05)');
+        gradientBlue.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradientBlue.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
 
         new Chart(ctx, {
             type: 'line',
@@ -202,7 +267,6 @@
                         label: 'Jumlah Visit per Hari',
                         data: visitData,
                         borderColor: '#2563EB',
-                        backgroundColor: gradientBlue,
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
@@ -257,7 +321,7 @@
             const chart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Visit', 'Belum Visit'],
+                    labels: ['Sudah Visit', 'Belum Visit'],
                     datasets: [{
                         data: [visit, notVisit],
                         backgroundColor: ['#22c55e', '#ef4444']
@@ -278,7 +342,7 @@
                     <!-- Visit -->
                     <div class="flex items-center gap-1">
                         <span class="material-symbols-outlined text-green-500 text-sm">where_to_vote</span>
-                        <span class="font-medium text-xs">Visit: ${visit}</span>
+                        <span class="font-medium text-xs">Sudah Visit: ${visit}</span>
                         <span class="text-gray-400 text-xs"> ${((visit / total) * 100).toFixed(1)}%</span>
                     </div>
 

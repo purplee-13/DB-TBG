@@ -34,6 +34,9 @@ Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])-
 Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
 Route::post('/maintenances/import', [MaintenanceController::class, 'importExcel'])->name('maintenances.import');
 
+// Bulk delete sites
+Route::post('/datasite/delete-multiple', [\App\Http\Controllers\SiteController::class, 'deleteMultiple'])->name('datasite.deleteMultiple');
+
 // Edit Site
 Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');
 Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::class, 'update'])->name('datasite.update');
@@ -41,5 +44,5 @@ Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::cl
 Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::class, 'destroy'])->name('datasite.delete');
 
 // 🟢 UPDATE MAINTENANCE
-Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('update-maintenance');
-// Route::post('/update-maintenance/store', [SiteController::class, 'storeMaintenance'])->name('maintenance.store');
+Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+Route::put('/maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');

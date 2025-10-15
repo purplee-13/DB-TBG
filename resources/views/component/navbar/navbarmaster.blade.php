@@ -1,4 +1,4 @@
-<nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between">
+<nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between relative">
     <div class="flex items-center gap-3">
         <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10">
         <div class="flex items-center gap-1">
@@ -14,31 +14,60 @@
         <li><a href="{{ url('/kelola-pengguna') }}" class="{{ request()->is('kelola-pengguna') ? 'text-[#022CB8] font-semibold border-b-2 border-[#022CB8] pb-1 transition-all duration-300' : 'hover:text-blue-600 hover:border-b-2 hover:border-blue-600 pb-1 transition-all duration-300' }}">Kelola Pengguna</a></li>
     </ul>
 
-    <div class="flex items-center gap-2">
-        <span class="text-black-600 font-medium">{{ session('name') }}</span>
-        <div class="bg-black rounded-full w-8 h-8 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white">person</span>
-        </div>
+    <!-- Profil dan Popup -->
+    <div class="flex items-center gap-3 relative">
+        <span class="text-black font-medium">{{ session('name') }}</span>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="text-red-600 hover:underline text-sm">Logout</button>
-        </form>
+        <!-- Tombol Icon Person -->
+        <button id="profile-btn" class="bg-black rounded-full w-8 h-8 flex items-center justify-center relative">
+            <span class="material-symbols-outlined text-white">person</span>
+        </button>
+
+        <!-- Popup Logout -->
+        <div id="logout-popup" class="hidden absolute right-0 top-12 bg-white shadow-lg border rounded-xl py-2 w-36 z-50">
+            <form method="POST" action="{{ route('logout') }}" class="text-center">
+                @csrf
+                <button type="submit" class="w-full text-red-600 hover:bg-red-50 py-2 rounded-lg transition-all duration-200">
+                    <span class="material-symbols-outlined align-middle text-red-600">logout</span>
+                    Logout
+                </button>
+            </form>
+        </div>
     </div>
 </nav>
 
+<!-- Jam real-time -->
 <script>
-    function updateClock() {
+    function updateDateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('id-ID', {
+        const witaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Makassar' }));
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateString = witaTime.toLocaleDateString('id-ID', dateOptions);
+        const timeString = witaTime.toLocaleTimeString('id-ID', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Makassar'
+            hour12: false
         });
+        document.getElementById("current-date").textContent = dateString;
         document.getElementById("current-time").textContent = timeString;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // Toggle popup logout
+    const profileBtn = document.getElementById('profile-btn');
+    const popup = document.getElementById('logout-popup');
+
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // cegah event bubbling
+        popup.classList.toggle('hidden');
+    });
+
+    // Klik di luar popup → popup tertutup
+    document.addEventListener('click', (e) => {
+        if (!popup.contains(e.target) && !profileBtn.contains(e.target)) {
+            popup.classList.add('hidden');
+        }
+    });
 </script>
