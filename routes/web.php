@@ -9,6 +9,7 @@ use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\UserController;
 
 
+
 // Redirect awal ke login
 Route::get('/', function () {
     return redirect()->route('login');
@@ -31,6 +32,7 @@ Route::get('/kelola-pengguna', [UserController::class, 'index'])->name('user.man
 // 🟢 DATA SITE
 Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');
 Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
+Route::post('/maintenances/import', [MaintenanceController::class, 'importExcel'])->name('maintenances.import');
 
 // Edit Site
 Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');

@@ -63,12 +63,7 @@ class AdminController extends Controller
         ->orderBy('sites.service_area')
         ->get();
 
-        $belumAll = $row->notvisit_fo + $row->notvisit_mmp;
-        $sudahAll = $row->visited_fo + $row->visited_mmp;
-        $grandAll = $belumAll + $sudahAll;
-
-        $percent = $grandAll > 0 ? round(($sudahAll / $grandAll) * 100, 2) : 0;
-
+        
         // === Perbandingan dengan bulan lalu ===
         $lastMonth = Carbon::now()->subMonth();
         $lastMonthTotal = Site::whereMonth('created_at', $lastMonth->month)
