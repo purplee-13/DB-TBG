@@ -132,18 +132,7 @@ class AdminController extends Controller
         $colorVisit = $growthVisit > 0 ? 'text-green-500' : ($growthVisit < 0 ? 'text-red-500' : 'text-gray-700');
         $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
 
-
-        $yesterdayNotVisit = (clone $baseQuery)
-            ->where('progres', 'Belum Visit')
-            ->whereDate('tgl_visit', Carbon::yesterday())
-            ->count();
-
-        $todayNotVisit = (clone $baseQuery)
-            ->where('progres', 'Belum Visit')
-            ->whereDate('tgl_visit', Carbon::today())
-            ->count();
-
-        $growthNotVisit = $todayNotVisit - $yesterdayNotVisit;
+        $growthNotVisit = $todayVisit;
         $colorNotVisit = $growthNotVisit > 0 ? 'text-green-500' : ($growthNotVisit < 0 ? 'text-red-500' : 'text-gray-700');
         $iconNotVisit = $growthNotVisit > 0 ? 'trending_up' : ($growthNotVisit < 0 ? 'trending_down' : 'trending_flat');
 
