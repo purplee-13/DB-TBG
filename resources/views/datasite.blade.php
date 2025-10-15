@@ -271,7 +271,6 @@
             let row = `
                 <tr>
                     <td class='py-2 px-4'>${index + 1}</td>
-                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                     <td class='py-2 px-4'>${site.site_code}</td>
                     <td class='py-2 px-4'>${site.site_name}</td>
                     <td class='py-2 px-4'>${site.service_area}</td>
@@ -293,6 +292,7 @@
                             </button>
                         </form>
                     </td>
+                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                 `;
             }
 
