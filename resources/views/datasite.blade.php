@@ -210,6 +210,7 @@
 
 <script>
     let sites = @json($sites);
+    let role = @json(session('role')); // ✅ kirim role ke JS
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
@@ -256,11 +257,12 @@
         renderTable(filtered);
     }
 
+    // ✅ renderTable fix - kolom aksi tidak hilang
     function renderTable(data) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
         data.forEach((site, index) => {
-            tableBody.innerHTML += `
+            let row = `
                 <tr>
                     <td class='py-2 px-4'>${index + 1}</td>
                     <td class='py-2 px-4'>${site.site_code}</td>
@@ -269,8 +271,26 @@
                     <td class='py-2 px-4'>${site.sto}</td>
                     <td class='py-2 px-4'>${site.product}</td>
                     <td class='py-2 px-4'>${site.tikor}</td>
-                </tr>
             `;
+
+            if (role === 'admin' || role === 'master') {
+                row += `
+                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
+                        <button class='text-blue-600 hover:text-blue-800' title='Edit' onclick='openEditModal(${site.id})'>
+                            <i class='fas fa-pen'></i>
+                        </button>
+                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                            <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
+                                <i class='fas fa-trash'></i>
+                            </button>
+                        </form>
+                    </td>
+                `;
+            }
+
+            row += `</tr>`;
+            tableBody.innerHTML += row;
         });
     }
 
