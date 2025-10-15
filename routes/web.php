@@ -32,6 +32,9 @@ Route::get('/kelola-pengguna', [UserController::class, 'index'])->name('user.man
 Route::get('/datasite', [\App\Http\Controllers\SiteController::class, 'index'])->name('datasite');
 Route::post('/datasite/store', [\App\Http\Controllers\SiteController::class, 'store'])->name('datasite.store');
 
+// Bulk delete sites
+Route::post('/datasite/delete-multiple', [\App\Http\Controllers\SiteController::class, 'deleteMultiple'])->name('datasite.deleteMultiple');
+
 // Edit Site
 Route::get('/datasite/{site}/edit', [\App\Http\Controllers\SiteController::class, 'edit'])->name('datasite.edit');
 Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::class, 'update'])->name('datasite.update');

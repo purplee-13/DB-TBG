@@ -3,6 +3,20 @@
 @section('content')
 <div class="p-6">
 
+    {{-- Notifikasi --}}
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Search Bar --}}
     <div class="flex justify-end items-center mb-4">
         <form method="GET" action="{{ route('maintenance.index') }}" class="relative" id="searchForm">
@@ -105,6 +119,7 @@
             <div class="mb-3">
                 <label class="block text-sm font-medium">Site ID</label>
                 <input type="text" id="editSiteId" class="w-full border rounded px-3 py-2" readonly>
+                <input type="hidden" id="editSiteHiddenId" name="site_id">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Site Name</label>

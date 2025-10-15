@@ -38,19 +38,45 @@ class MaintenanceController extends Controller
     {
         $request->validate([
             'site_id' => 'required|exists:sites,id',
-            'technician' => 'required|string',
-            'description' => 'nullable|string',
-            'visit_date' => 'required|date',
-            'status' => 'required|string',
+            'teknisi' => 'nullable|string',
+            'keterangan' => 'nullable|string',
+            'tngl_visit' => 'nullable|date',
+            // Accept both 'Visit' and legacy label 'Sudah Visit'
+            'progres' => 'required|in:Visit,Belum Visit,Sudah Visit',
             'operator' => 'nullable|string',
-            'notes' => 'nullable|string',
         ]);
 
-        Maintenance::create($request->only([
-            'site_id','technician','description','visit_date','status','operator','notes'
-        ]));
+        // Upsert: if a maintenance record exists for this site on the same date, update it; otherwise create
+        $siteId = $request->input('site_id');
+    // Use provided date or default to today so user can update progres without filling date
+    $date = $request->input('tngl_visit') ?: now()->toDateString();
 
-        return redirect()->route('maintenances.index')->with('success','Data maintenance berhasil disimpan.');
+        $maintenance = Maintenance::where('site_id', $siteId)
+            ->whereDate('tngl_visit', $date)
+            ->first();
+
+        // Normalize progres value to canonical DB enum 'Visit' or 'Belum Visit'
+        $progresInput = $request->input('progres');
+        if ($progresInput === 'Sudah Visit') {
+            $progresInput = 'Visit';
+        }
+
+        $data = [
+            'site_id' => $siteId,
+            'teknisi' => $request->input('teknisi'),
+            'keterangan' => $request->input('keterangan'),
+            'tngl_visit' => $date,
+            'progres' => $progresInput,
+            'operator' => $request->input('operator'),
+        ];
+
+        if ($maintenance) {
+            $maintenance->update($data);
+        } else {
+            Maintenance::create($data);
+        }
+
+        return redirect()->route('update-maintenance')->with('success','Data maintenance berhasil disimpan.');
     }
 
     public function edit(Maintenance $maintenance)

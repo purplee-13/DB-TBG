@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">
-                <x-service-sto-dropdown />
+            <x-service-sto-dropdown :selectedServiceArea="$selectedServiceArea" :selectedSto="$selectedSto" />
         </div>
     </div>
 
@@ -21,7 +21,7 @@
                     @elseif ($growth < 0)
                         <p class="{{ $color }} text-sm">{{ $growth }} dari bulan lalu</p>
                     @else
-                        <p class="{{ $color }} text-sm">0 perubahan dari hari kemarin ini</p>
+                        <p class="{{ $color }} text-sm">0 dari hari kemarin ini</p>
                     @endif
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     @elseif ($growthVisit < 0)
                         <p class="{{ $colorVisit }} text-sm">{{ $growthVisit }} dari hari kemarin</p>
                     @else
-                        <p class="{{ $colorVisit }} text-sm">0 perubahan dari hari kemarin</p>
+                        <p class="{{ $colorVisit }} text-sm">0 dari hari kemarin</p>
                     @endif
                 </div>
             </div>
@@ -49,14 +49,8 @@
                 <h3 class="text-[#022CB8] font-semibold">BELUM VISIT</h3>
                 <p class="text-4xl font-bold text-black-600">{{ $notVisitedSites }}</p>
                 <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined {{ $colorNotVisit }} text-sm">{{ $iconNotVisit }}</span>
-                    @if ($growthNotVisit > 0)
-                        <p class="{{ $colorNotVisit }} text-sm">+{{ $growthNotVisit }} dari hari kemarin</p>
-                    @elseif ($growthNotVisit < 0)
-                        <p class="{{ $colorNotVisit }} text-sm">{{ $growthNotVisit }} dari hari kemarin</p>
-                    @else
-                        <p class="{{ $colorNotVisit }} text-sm">0 perubahan dari hari kemarin</p>
-                    @endif
+                    <span class="material-symbols-outlined text-red-500 text-sm">trending_down</span>
+                        <p class="text-red-500 text-sm">-{{ $growthNotVisit }} dari hari kemarin</p>
                 </div>
             </div>
         </div>
@@ -80,7 +74,7 @@
                         <img src="{{ asset('assets/icon/area.png') }}" alt="Service Area" class="w-6 h-6">
                         <div class="text-center">
                             <h3 class="text-xs text-white font-semibold">Service Area</h3>
-                            <p class="text-3xl text- font-bold text-white">9</p>
+                            <p class="text-3xl text- font-bold text-white">8</p>
                         </div>
                     </div>
                     
@@ -261,8 +255,8 @@
         const daysInMonth = @json($daysInMonth);
         const ctx = document.getElementById('trendChart').getContext('2d');
         const gradientBlue = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientBlue.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
-        gradientBlue.addColorStop(1, 'rgba(37, 99, 235, 0.05)');
+        gradientBlue.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradientBlue.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
 
         new Chart(ctx, {
             type: 'line',
@@ -273,7 +267,6 @@
                         label: 'Jumlah Visit per Hari',
                         data: visitData,
                         borderColor: '#2563EB',
-                        backgroundColor: gradientBlue,
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,

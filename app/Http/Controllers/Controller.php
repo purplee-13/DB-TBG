@@ -39,13 +39,6 @@ class Controller extends BaseController
         return redirect()->route('login');
     }
 
-    // Dashboard
-    public function dashboard()
-    {
-        // Sudah dijaga oleh middleware auth, tidak perlu cek lagi
-        return view('dashboard');
-    }
-
     
     // 🟢 Simpan Data Maintenance
     public function storeMaintenance(Request $request)

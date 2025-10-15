@@ -38,19 +38,22 @@
 
 <!-- Jam real-time -->
 <script>
-    function updateClock() {
+    function updateDateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('id-ID', {
+        const witaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Makassar' }));
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateString = witaTime.toLocaleDateString('id-ID', dateOptions);
+        const timeString = witaTime.toLocaleTimeString('id-ID', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Makassar'
+            hour12: false
         });
+        document.getElementById("current-date").textContent = dateString;
         document.getElementById("current-time").textContent = timeString;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
     // Toggle popup logout
     const profileBtn = document.getElementById('profile-btn');
