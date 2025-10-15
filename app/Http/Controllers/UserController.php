@@ -8,10 +8,30 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // Allow only users with role 'Master' to access any method in this controller.
+        $this->middleware(function ($request, $next) {
+            $user = auth()->user();
+
+            // Some parts of the app use custom session-based auth; also check session('role')
+            $role = $user?->role ?? session('role');
+
+            // Normalize role to lowercase for comparison (database uses lowercase values)
+            $role = is_string($role) ? strtolower($role) : $role;
+
+            if ($role !== 'master') {
+                abort(403, 'Unauthorized - hanya Master yang dapat mengakses halaman ini.');
+            }
+
+            return $next($request);
+        });
+    }
     // Tampilkan semua user
     public function index()
     {
-        $users = User::where('role', '!=', 'Master')->get();
+        // Exclude master accounts (roles stored lowercase in DB)
+        $users = User::where('role', '!=', 'master')->get();
         return view('kelola-pengguna', compact('users'));
     }
 
@@ -22,14 +42,14 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'username' => 'required|string|max:100|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:Admin,Pegawai'
+            'role' => 'required|in:admin,pegawai'
         ]);
 
         User::create([
             'name' => $request->name,
             'username' => $request->username,
             'password' => Hash::make($request->password),
-            'role' => $request->role
+            'role' => strtolower($request->role)
         ]);
 
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
@@ -53,7 +73,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password); // ⬅️ penting!
         }
 
-        $user->role = $request->role;
+    $user->role = strtolower($request->role);
         $user->save();
 
         return redirect()->back()->with('success', 'User berhasil diperbarui.');

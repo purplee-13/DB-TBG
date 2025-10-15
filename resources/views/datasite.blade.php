@@ -38,6 +38,9 @@
                 class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1">
                 <span class="text-lg font-semibold">+</span> Tambah
             </button>
+            
+            <button id="bulkDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 items-center gap-1 p-1.5">Hapus Terpilih</button>
+           
         @endif
     </div>
 
@@ -57,6 +60,7 @@
                         {{-- Kolom Aksi hanya muncul untuk admin dan master --}}
                         @if(session('role') == 'admin' || session('role') == 'master')
                             <th class="py-2 px-4 text-center">Aksi</th>
+                            <th class="py-3 px-4 text-center" id="selectAll">Pilih</th>
                         @endif
                     </tr>
                 </thead>
@@ -84,6 +88,7 @@
                                 </button>
                             </form>
                         </td>
+                        <td class="py-2 px-4 text-center"><input type="checkbox" class="row-checkbox" value="{{ $site->id }}"></td>
                         @endif
                     </tr>
                     @endforeach
@@ -91,6 +96,7 @@
             </table>
         </div>
     </div>
+
 
     {{-- =================== MODAL TAMBAH =================== --}}
     @if(session('role') == 'admin' || session('role') == 'master')
@@ -210,6 +216,7 @@
 
 <script>
     let sites = @json($sites);
+    let role = @json(session('role')); // ✅ kirim role ke JS
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
@@ -256,23 +263,88 @@
         renderTable(filtered);
     }
 
+    // ✅ renderTable fix - kolom aksi tidak hilang
     function renderTable(data) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
         data.forEach((site, index) => {
-            tableBody.innerHTML += `
+            let row = `
                 <tr>
                     <td class='py-2 px-4'>${index + 1}</td>
+                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                     <td class='py-2 px-4'>${site.site_code}</td>
                     <td class='py-2 px-4'>${site.site_name}</td>
                     <td class='py-2 px-4'>${site.service_area}</td>
                     <td class='py-2 px-4'>${site.sto}</td>
                     <td class='py-2 px-4'>${site.product}</td>
                     <td class='py-2 px-4'>${site.tikor}</td>
-                </tr>
             `;
+
+            if (role === 'admin' || role === 'master') {
+                row += `
+                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
+                        <button class='text-blue-600 hover:text-blue-800' title='Edit' onclick='openEditModal(${site.id})'>
+                            <i class='fas fa-pen'></i>
+                        </button>
+                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                            <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
+                                <i class='fas fa-trash'></i>
+                            </button>
+                        </form>
+                    </td>
+                `;
+            }
+
+            row += `</tr>`;
+            tableBody.innerHTML += row;
         });
+
+        // Re-bind selectAll behavior for dynamic rows
+        const selectAll = document.getElementById('selectAll');
+        if (selectAll) {
+            selectAll.checked = false;
+            selectAll.addEventListener('change', function() {
+                const checked = this.checked;
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+            });
+        }
+
+        // Bulk delete button
+        const bulkBtn = document.getElementById('bulkDeleteBtn');
+        if (bulkBtn) {
+            bulkBtn.addEventListener('click', async function() {
+                const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+                if (selected.length === 0) {
+                    alert('Pilih minimal satu data untuk dihapus.');
+                    return;
+                }
+                if (!confirm('Yakin ingin menghapus ' + selected.length + ' data terpilih?')) return;
+
+                try {
+                    const res = await fetch('{{ route('datasite.deleteMultiple') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ids: selected })
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        location.reload();
+                    } else {
+                        alert(json.message || 'Terjadi kesalahan saat menghapus.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Gagal menghapus data. Cek console untuk detail.');
+                }
+            });
+        }
     }
+    renderTable(sites);
 
     function clearSearch() {
         document.getElementById('searchInput').value = "";

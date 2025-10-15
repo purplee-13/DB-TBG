@@ -72,4 +72,18 @@ class SiteController extends Controller
     $site->delete();
     return redirect()->route('datasite')->with('success','Site berhasil dihapus.');
     }
+
+    public function deleteMultiple(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return response()->json(['success' => false, 'message' => 'ID tidak valid']);
+        }
+
+        Site::whereIn('id', $ids)->delete();
+
+        return response()->json(['success' => true]);
+    }
+
 }
