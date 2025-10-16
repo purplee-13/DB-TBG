@@ -42,5 +42,31 @@ Route::post('/datasite/{site}/update', [\App\Http\Controllers\SiteController::cl
 Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::class, 'destroy'])->name('datasite.delete');
 
 // 🟢 UPDATE MAINTENANCE
-Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('update-maintenance');
-Route::post('/update-maintenance/store', [MaintenanceController::class, 'store'])->name('update-maintenance.store');
+Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+Route::put('/maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');
+
+// Temporary dev helpers (only in local environment)
+if (app()->environment('local')) {
+    Route::get('/dev-login/{username}', function ($username) {
+        $user = \App\Models\User::where('username', $username)->first();
+        if (! $user) {
+            abort(404, 'User not found');
+        }
+
+        session([
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+            'role' => $user->role,
+        ]);
+
+        return redirect()->route('dashboard');
+    })->name('dev.login');
+
+    Route::get('/dashboard-test', function () {
+        if (! session()->has('user_id')) {
+            return response()->json(['logged_in' => false, 'session' => session()->all()]);
+        }
+        return response()->json(['logged_in' => true, 'session' => session()->only(['user_id','username','name','role'])]);
+    });
+}

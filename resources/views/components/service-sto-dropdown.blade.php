@@ -1,46 +1,19 @@
-<form method="GET" action="{{ route('dashboard') }}" class="flex gap-4">
-    <select name="service_area" id="serviceArea" class="border rounded-lg px-3 py-2" onchange="this.form.submit()">
-        <option value="">Pilih Service Area</option>
-        @foreach ($data as $area => $stos)
-            <option value="{{ $area }}" {{ $selectedServiceArea == $area ? 'selected' : '' }}>{{ $area }}</option>
-        @endforeach
-    </select>
+@props(['selectedServiceArea' => null, 'selectedSto' => null])
 
-    <select name="sto" id="sto" class="border rounded-lg px-3 py-2" onchange="this.form.submit()">
-        <option value="">Pilih STO</option>
-        @if($selectedServiceArea && isset($data[$selectedServiceArea]))
-            @foreach($data[$selectedServiceArea] as $sto)
-                <option value="{{ $sto }}" {{ $selectedSto == $sto ? 'selected' : '' }}>{{ $sto }}</option>
-            @endforeach
-        @endif
-    </select>
-    @if($selectedServiceArea || $selectedSto)
-        <button type="button" onclick="clearFilters()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-            Clear Filters
-        </button>
-    @endif
-</form>
+<div class="flex items-center gap-2">
+    <form method="GET" action="{{ route('dashboard') }}">
+        <select name="service_area" onchange="this.form.submit()" class="px-3 py-2 border rounded">
+            <option value="">-- All Service Area --</option>
+            <option value="SA1" {{ $selectedServiceArea == 'SA1' ? 'selected' : '' }}>SA1</option>
+            <option value="SA2" {{ $selectedServiceArea == 'SA2' ? 'selected' : '' }}>SA2</option>
+        </select>
+    </form>
 
-<script>
-    const stoOptions = @json($data);
-    const serviceSelect = document.getElementById('serviceArea');
-    const stoSelect = document.getElementById('sto');
-
-    serviceSelect.addEventListener('change', function () {
-        const selectedArea = this.value;
-        stoSelect.innerHTML = '<option value="">Pilih STO</option>';
-
-        if (stoOptions[selectedArea]) {
-            stoOptions[selectedArea].forEach(sto => {
-                const opt = document.createElement('option');
-                opt.value = sto;
-                opt.textContent = sto;
-                stoSelect.appendChild(opt);
-            });
-        }
-    });
-
-    function clearFilters() {
-        window.location.href = '{{ route("dashboard") }}';
-    }
-</script>
+    <form method="GET" action="{{ route('dashboard') }}">
+        <select name="sto" onchange="this.form.submit()" class="px-3 py-2 border rounded">
+            <option value="">-- All STO --</option>
+            <option value="STO1" {{ $selectedSto == 'STO1' ? 'selected' : '' }}>STO1</option>
+            <option value="STO2" {{ $selectedSto == 'STO2' ? 'selected' : '' }}>STO2</option>
+        </select>
+    </form>
+</div>

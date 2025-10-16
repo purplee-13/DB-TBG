@@ -3,6 +3,32 @@
 @section('content')
 <div class="p-6">
 
+    {{-- 🔔 Notifikasi Sukses --}}
+    @if (session('success'))
+        <div id="notif-success"
+            class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
+            {{ session('success') }}
+        </div>
+        <script>
+            // Hilangkan notifikasi otomatis setelah 3 detik
+            setTimeout(() => {
+                document.getElementById('notif-success').style.display = 'none';
+            }, 3000);
+        </script>
+    @endif
+
+    {{-- ⚠️ Notifikasi Error --}}
+    @if ($errors->any())
+        <div id="notif-error"
+            class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
+            <ul class="list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Tombol Tambah --}}
     <div class="flex justify-end mb-4">
         <button onclick="openModal()"
@@ -60,12 +86,14 @@
                 @csrf
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Nama Pengguna</label>
-                    <input type="text" name="name" placeholder="Masukkan nama"
+                    <input type="text" name="name" value="{{ old('name') }}"
+                        placeholder="Masukkan nama"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Username</label>
-                    <input type="text" name="username" placeholder="Masukkan username"
+                    <input type="text" name="username" value="{{ old('username') }}"
+                        placeholder="Masukkan username"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                 </div>
                 <div class="mb-3">
@@ -78,8 +106,8 @@
                     <select name="role"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                         <option value="">Pilih Role</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Pegawai">Pegawai</option>
+                        <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="Pegawai" {{ old('role') == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
                     </select>
                 </div>
 
