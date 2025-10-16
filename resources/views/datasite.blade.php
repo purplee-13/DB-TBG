@@ -216,7 +216,7 @@
 
 <script>
     let sites = @json($sites);
-    let role = @json(session('role')); // ✅ kirim role ke JS
+    let role = @json(session('role'));
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);

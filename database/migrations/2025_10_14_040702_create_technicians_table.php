@@ -1,44 +1,29 @@
 <?php
 
-namespace Database\Seeders;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-
-class TechniciansTableSeeder extends Seeder
+return new class extends Migration
 {
-    public function run(): void
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        $data = [
-            ['sto' => 'MAS', 'jumlah_teknisi' => 4],
-            ['sto' => 'MLL', 'jumlah_teknisi' => 1],
-            ['sto' => 'TMN', 'jumlah_teknisi' => 2],
-            ['sto' => 'MAJ', 'jumlah_teknisi' => 1],
-            ['sto' => 'MMS', 'jumlah_teknisi' => 1],
-            ['sto' => 'PLW', 'jumlah_teknisi' => 2],
-            ['sto' => 'MAM', 'jumlah_teknisi' => 2],
-            ['sto' => 'PKA', 'jumlah_teknisi' => 2],
-            ['sto' => 'TPY', 'jumlah_teknisi' => 1],
-            ['sto' => 'BLP', 'jumlah_teknisi' => 1],
-            ['sto' => 'PLP', 'jumlah_teknisi' => 7],
-            ['sto' => 'BAR', 'jumlah_teknisi' => 1],
-            ['sto' => 'PRE', 'jumlah_teknisi' => 2],
-            ['sto' => 'PIN', 'jumlah_teknisi' => 3],
-            ['sto' => 'SID', 'jumlah_teknisi' => 2],
-            ['sto' => 'TTE', 'jumlah_teknisi' => 2],
-            ['sto' => 'ENR', 'jumlah_teknisi' => 2],
-            ['sto' => 'MAK', 'jumlah_teknisi' => 3],
-            ['sto' => 'RTP', 'jumlah_teknisi' => 4],
-            ['sto' => 'SIW', 'jumlah_teknisi' => 2],
-            ['sto' => 'SKG', 'jumlah_teknisi' => 4],
-            ['sto' => 'WTG', 'jumlah_teknisi' => 2],
-        ];
-
-        foreach ($data as $tech) {
-            DB::table('technicians')->updateOrInsert(
-                ['sto' => $tech['sto']],
-                ['jumlah_teknisi' => $tech['jumlah_teknisi']]
-            );
-        }
+        Schema::create('technicians', function (Blueprint $table) {
+            $table->id();
+            $table->string('sto')->unique(); // kode STO
+            $table->integer('jumlah_teknisi')->default(0);
+            $table->timestamps();
+        });
     }
-}
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('technicians');
+    }
+};
