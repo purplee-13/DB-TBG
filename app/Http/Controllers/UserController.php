@@ -20,6 +20,7 @@ class UserController extends Controller
             // Normalize role to lowercase for comparison (database uses lowercase values)
             $role = is_string($role) ? strtolower($role) : $role;
 
+            // Only master can manage users
             if ($role !== 'master') {
                 abort(403, 'Unauthorized - hanya Master yang dapat mengakses halaman ini.');
             }
@@ -66,17 +67,26 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+
+        // Validate input; username must be unique except for this user
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'username' => 'required|string|max:100|unique:users,username,' . $id,
+            'password' => 'nullable|string|min:6',
+            'role' => 'required|in:admin,pegawai'
+        ]);
+
         $user->name = $request->name;
         $user->username = $request->username;
 
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password); // ⬅️ penting!
+            $user->password = Hash::make($request->password);
         }
 
-    $user->role = strtolower($request->role);
+        $user->role = strtolower($request->role);
         $user->save();
 
-        return redirect()->back()->with('success', 'User berhasil diperbarui.');
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
 
 
