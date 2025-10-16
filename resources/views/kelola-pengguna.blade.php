@@ -106,8 +106,8 @@
                     <select name="role"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                         <option value="">Pilih Role</option>
-                        <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="Pegawai" {{ old('role') == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
+                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="pegawai" {{ old('role') == 'pegawai' ? 'selected' : '' }}>Pegawai</option>
                     </select>
                 </div>
 
@@ -148,8 +148,8 @@
                     <label class="block text-sm font-medium">Role</label>
                     <select id="editRole" name="role"
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-                        <option value="Admin">Admin</option>
-                        <option value="Pegawai">Pegawai</option>
+                        <option value="admin">Admin</option>
+                        <option value="pegawai">Pegawai</option>
                     </select>
                 </div>
 
@@ -184,10 +184,17 @@
 
         document.getElementById('editName').value = name;
         document.getElementById('editUsername').value = username;
-        document.getElementById('editRole').value = role;
+
+        // role from DB may be 'Admin' or 'admin' - normalize to lowercase to match option values
+        if (role && typeof role === 'string') {
+            try { role = role.toLowerCase(); } catch (e) {}
+        }
+        document.getElementById('editRole').value = role || '';
 
         const form = document.getElementById('editForm');
-        form.action = `/users/${id}`;
+        // Use server-generated base URL to support subfolder deployments
+        const usersBase = "{{ url('users') }}";
+        form.action = usersBase + '/' + id;
     }
 
     function closeEditModal() {

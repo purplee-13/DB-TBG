@@ -69,4 +69,23 @@ if (app()->environment('local')) {
         }
         return response()->json(['logged_in' => true, 'session' => session()->only(['user_id','username','name','role'])]);
     });
+
+    // Dev: quick update user for testing (local only)
+    Route::get('/dev-update-user/{id}', function ($id, \Illuminate\Http\Request $request) {
+        $user = \App\Models\User::find($id);
+        if (! $user) return response()->json(['ok' => false, 'message' => 'User not found'], 404);
+
+        $name = $request->query('name');
+        $username = $request->query('username');
+        $role = $request->query('role');
+        $password = $request->query('password');
+
+        if ($name) $user->name = $name;
+        if ($username) $user->username = $username;
+        if ($role) $user->role = strtolower($role);
+        if ($password) $user->password = bcrypt($password);
+
+        $user->save();
+        return response()->json(['ok' => true, 'user' => $user]);
+    });
 }
