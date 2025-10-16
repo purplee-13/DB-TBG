@@ -133,6 +133,8 @@ class AdminController extends Controller
         $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
 
         $growthNotVisit = $todayVisit;
+        $colorNotVisit = $growthNotVisit > 0 ? 'text-red-500' : ($growthVisit == 0 ? 'text-gray-700' : 'text-gray-700');
+        $iconNotVisit = $growthNotVisit > 0 ? 'trending_down' : ($growthVisit == 0 ? 'trending_flat' : 'trending_flat');
 
         // Data grafik per produk
         foreach ($products as $product) {
@@ -187,6 +189,8 @@ class AdminController extends Controller
             'growthNotVisit' => $growthNotVisit,
             'selectedServiceArea' => $serviceArea,
             'selectedSto' => $sto,
+            'iconNotVisit' => $iconNotVisit,
+            'colorNotVisit' => $colorNotVisit,
         ]);
     }
 }

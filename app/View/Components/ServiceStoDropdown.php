@@ -39,8 +39,8 @@ class ServiceStoDropdown extends Component
             'SA MAMUJU'     => ['MAM','PKA','TPY'],
             'SA PALOPO'     => ['BLP','PLP'],
             'SA PAREPARE'   => ['BAR','PRE'],
-            'SA PINRANG'    => ['ENR','PIN','SID','TTE'],
-            'SA TORAJA'     => ['MAK','RTP'],
+            'SA PINRANG'    => ['PIN','SID','TTE'],
+            'SA TORAJA'     => ['ENR','MAK','RTP'],
             'SA WAJO'       => ['SIW','SKG','WTG'],
         ];
         $this->selectedServiceArea = $selectedServiceArea;

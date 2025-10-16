@@ -114,22 +114,12 @@
                     <input type="text" name="site_name" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Service Area</label>
-                    <select name="service_area" class="w-full border rounded-lg px-3 py-2" required>
-                        <option value="">Pilih Service Area</option>
-                        @foreach(array_keys(config('sto')) as $area)
-                            <option value="{{ $area }}">{{ $area }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium">STO</label>
-                    <select name="sto" class="w-full border rounded-lg px-3 py-2" required>
-                        <option value="">Pilih STO</option>
-                        @foreach(array_unique(array_merge(...array_values(config('sto')))) as $sto)
-                            <option value="{{ $sto }}">{{ $sto }}</option>
-                        @endforeach
-                    </select>
+                    <x-dropdown-sa-sto-form 
+                        :serviceAreas="$serviceAreas" 
+                        :stosByArea="$stosByArea" 
+                        :selectedServiceArea="old('service_area', null)" 
+                        :selectedSto="old('sto', null)"
+                        idPrefix="add" />
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
@@ -162,7 +152,6 @@
             <h2 class="text-xl font-bold mb-4">Edit Site</h2>
             <form id="editSiteForm" method="POST">
                 @csrf
-                <input type="hidden" name="_method" value="POST">
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Site Id</label>
                     <input type="number" id="editSiteID" name="site_code" class="w-full border rounded-lg px-3 py-2" required>
@@ -172,22 +161,12 @@
                     <input type="text" id="editSiteName" name="site_name" class="w-full border rounded-lg px-3 py-2" required>
                 </div>
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Service Area</label>
-                    <select id="editServiceArea" name="service_area" class="w-full border rounded-lg px-3 py-2" required>
-                        <option value="">Pilih Service Area</option>
-                        @foreach(array_keys(config('sto')) as $area)
-                            <option value="{{ $area }}">{{ $area }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium">STO</label>
-                    <select id="editSTO" name="sto" class="w-full border rounded-lg px-3 py-2" required>
-                        <option value="">Pilih STO</option>
-                        @foreach(array_unique(array_merge(...array_values(config('sto')))) as $sto)
-                            <option value="{{ $sto }}">{{ $sto }}</option>
-                        @endforeach
-                    </select>
+                    <x-dropdown-sa-sto-form 
+                        :serviceAreas="$serviceAreas" 
+                        :stosByArea="$stosByArea" 
+                        :selectedServiceArea="null" 
+                        :selectedSto="null"
+                        idPrefix="edit" />
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Product</label>
@@ -216,7 +195,7 @@
 
 <script>
     let sites = @json($sites);
-    let role = @json(session('role')); // ✅ kirim role ke JS
+    let role = @json(session('role')); 
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
@@ -230,11 +209,32 @@
         document.getElementById('editSiteForm').action = `/datasite/${siteId}/update`;
         document.getElementById('editModal').classList.remove('hidden');
         document.getElementById('editModal').classList.add('flex');
+        // Set nilai dropdown berdasarkan data site
+        const editServiceArea = document.getElementById('editServiceArea');
+        const editSTO = document.getElementById('editSTO');
+
+        if (editServiceArea) {
+            editServiceArea.value = site.service_area;
+
+            // Trigger event "change" biar dropdown STO update otomatis
+            const changeEvent = new Event('change');
+            editServiceArea.dispatchEvent(changeEvent);
+
+            // Tunggu 100ms supaya list STO ter-update dulu
+            setTimeout(() => {
+                if (editSTO) editSTO.value = site.sto;
+            }, 100);
+        }
+            // Tampilkan modal
+        const modal = document.getElementById('editModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
-        document.getElementById('editModal').classList.remove('flex');
+        const modal = document.getElementById('editModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 
     function openAddModal() {

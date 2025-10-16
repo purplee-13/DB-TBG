@@ -35,7 +35,10 @@ class SiteController extends Controller
     public function index()
     {
         $sites = Site::orderBy('id','desc')->get();
-        return view('datasite', compact('sites'));
+        $data = config('sto');
+        $serviceAreas = array_keys($data);
+        $stosByArea = $data;
+        return view('datasite', compact('sites', 'serviceAreas', 'stosByArea'));
     }
 
     public function create()
