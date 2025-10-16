@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sites', function (Blueprint $table) {
-            $table->string('month_reference')->nullable()->after('tikor');
-        });
+        if (!Schema::hasColumn('sites', 'month_reference')) {
+            Schema::table('sites', function (Blueprint $table) {
+                $table->string('month_reference')->nullable()->after('tikor');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sites', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('sites', 'month_reference')) {
+            Schema::table('sites', function (Blueprint $table) {
+                $table->dropColumn('month_reference');
+            });
+        }
     }
 };

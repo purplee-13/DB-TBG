@@ -19,22 +19,35 @@
 
     {{-- Search Bar --}}
     <div class="flex justify-end items-center mb-4">
-        <div class="relative">
-            <input type="text" placeholder="Cari Data Site"
-                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+        <form method="GET" action="{{ route('maintenance.index') }}" class="relative" id="searchForm">
+            <input type="text" name="search" placeholder="Cari berdasarkan Site ID atau Site Name"
+                value="{{ request('search') }}"
+                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300 w-80"
+                id="searchInput">
             <span class="absolute left-3 top-2.5 text-gray-500">
                 <i class="fas fa-search"></i>
             </span>
-            <button class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+            @if(request('search'))
+                <a href="{{ route('maintenance.index') }}" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </a>
+            @endif
+        </form>
     </div>
+
+    {{-- Search Results Info --}}
+    @if(request('search'))
+        <div class="mb-4 text-sm text-gray-600">
+            <span class="font-medium">{{ $sites->count() }}</span> hasil ditemukan untuk "<span class="font-medium">{{ request('search') }}</span>"
+            <a href="{{ route('maintenance.index') }}" class="text-blue-600 hover:text-blue-800 ml-2">Tampilkan semua</a>
+        </div>
+    @endif
 
     {{-- Table --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
-        <table class="min-w-full text-sm border border-gray-200">
-            <thead class="bg-blue-600 text-white">
+        <div class="max-h-[600px] overflow-y-auto">
+            <table class="min-w-full text-sm border border-gray-200">
+            <thead class="bg-blue-600 text-white sticky top-0 z-10">
                 <tr>
                     <th class="py-3 px-4 text-left">NO</th>
                     <th class="py-3 px-4 text-left">Site ID</th>
@@ -49,45 +62,36 @@
             </thead>
             <tbody class="divide-y">
                 @foreach ($sites as $index => $site)
-                    @php
-                        $last = $site->maintenances->first();
-                        // format date for display
-                        $tgl = $last && $last->tngl_visit ? $last->tngl_visit->format('d/m/Y') : '-';
-                        $teknisi = $last->teknisi ?? '';
-                        $progres = $last->progres ?? 'Belum Visit';
-                        $operator = $last->operator ?? '';
-                        $keterangan = $last->keterangan ?? '';
-                    @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="py-2 px-4">{{ $index + 1 }}</td>
                         <td class="py-2 px-4">{{ $site->site_code }}</td>
                         <td class="py-2 px-4">{{ $site->site_name }}</td>
-                        <td class="py-2 px-4">{{ $teknisi }}</td>
-                        <td class="py-2 px-4">{{ $tgl }}</td>
+                        <td class="py-2 px-4">{{ $site->teknisi ?? '-' }}</td>
+                        <td class="py-2 px-4">{{ $site->tgl_visit ? \Carbon\Carbon::parse($site->tgl_visit)->format('d/m/Y') : '-' }}</td>
                         <td class="py-2 px-4">
-                            @if($progres == 'Visit')
+                            @if($site->progres == 'Sudah Visit')
                                 <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                    {{ $progres }}
+                                    {{ $site->progres }}
                                 </span>
                             @else
                                 <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                    {{ $progres }}
+                                    {{ $site->progres }}
                                 </span>
                             @endif
                         </td>
-                        <td class="py-2 px-4">{{ $operator }}</td>
-                        <td class="py-2 px-4">{{ $keterangan }}</td>
+                        <td class="py-2 px-4">{{ $site->operator ?? '-' }}</td>
+                        <td class="py-2 px-4">{{ $site->keterangan ?? '-' }}</td>
                         <td class="py-2 px-4 text-center">
                             <button 
-                                class="text-blue-600 hover:text-blue-800 edit-btn"
+                                class="text- blue-600 hover:text-blue-800 edit-btn"
                                 data-id="{{ $site->id }}"
-                                data-code="{{ $site->site_code }}"
-                                data-name="{{ $site->site_name }}"
-                                data-teknisi="{{ $teknisi }}"
-                                data-tgl="{{ $last && $last->tngl_visit ? $last->tngl_visit->format('Y-m-d') : '' }}"
-                                data-progres="{{ $progres }}"
-                                data-operator="{{ $operator }}"
-                                data-ket="{{ $keterangan }}"
+                                data-site-code="{{ $site->site_code }}"
+                                data-site-name="{{ $site->site_name }}"
+                                data-teknisi="{{ $site->teknisi }}"
+                                data-tgl="{{ $site->tgl_visit ? \Carbon\Carbon::parse($site->tgl_visit)->format('d/m/Y') : '' }}"
+                                data-progres="{{ $site->progres }}"
+                                data-operator="{{ $site->operator }}"
+                                data-ket="{{ $site->keterangan }}"
                                 title="Edit">
                                 <i class="fas fa-pen"></i>
                             </button>
@@ -96,6 +100,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 
@@ -103,8 +108,9 @@
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-semibold mb-4 text-blue-600">Edit Data Site</h2>
-        <form method="POST" action="{{ route('update-maintenance.store') }}">
+        <form method="POST" action="{{ route('maintenance.update', 0) }}" id="editForm">
             @csrf
+            @method('PUT')
             <div class="mb-3">
                 <label class="block text-sm font-medium">Site ID</label>
                 <input type="text" id="editSiteId" class="w-full border rounded px-3 py-2" readonly>
@@ -120,12 +126,12 @@
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Tanggal Visit</label>
-                <input type="date" id="editTglVisit" name="tngl_visit" class="w-full border rounded px-3 py-2">
+                <input type="date" id="editTglVisit" name="tgl_visit" class="w-full border rounded px-3 py-2">
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium">Progres</label>
                 <select id="editProgres" name="progres" class="w-full border rounded px-3 py-2">
-                    <option value="Visit">Visit</option>
+                    <option value="Sudah Visit">Sudah Visit</option>
                     <option value="Belum Visit">Belum Visit</option>
                 </select>
             </div>
@@ -152,6 +158,7 @@
     const editBtns = document.querySelectorAll('.edit-btn');
 
     // Form Fields
+    const editForm = document.getElementById('editForm');
     const siteIdField = document.getElementById('editSiteId');
     const siteNameField = document.getElementById('editSiteName');
     const teknisiField = document.getElementById('editTeknisi');
@@ -163,18 +170,19 @@
     // Open Modal & Fill Data
     editBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            siteIdField.value = btn.dataset.code || btn.dataset.id;
-            document.getElementById('editSiteHiddenId').value = btn.dataset.id;
-            siteNameField.value = btn.dataset.name;
+            // Update form action with correct site ID
+            editForm.action = editForm.action.replace(/\/\d+$/, '/' + btn.dataset.id);
+            
+            siteIdField.value = btn.dataset.siteCode;
+            siteNameField.value = btn.dataset.siteName;
             teknisiField.value = btn.dataset.teknisi || '';
-            // Accept either dd/mm/yyyy or yyyy-mm-dd in data attribute
-            const rawDate = btn.dataset.tgl || '';
-            if (rawDate.includes('/')) {
-                tglField.value = rawDate.split('/').reverse().join('-'); // dd/mm/yyyy -> yyyy-mm-dd
+            // Convert date format from dd/mm/yyyy to yyyy-mm-dd
+            if (btn.dataset.tgl) {
+                tglField.value = btn.dataset.tgl.split('/').reverse().join('-');
             } else {
-                tglField.value = rawDate; // already yyyy-mm-dd or empty
+                tglField.value = '';
             }
-            progresField.value = btn.dataset.progres || 'Belum Visit';
+            progresField.value = btn.dataset.progres;
             operatorField.value = btn.dataset.operator || '';
             ketField.value = btn.dataset.ket || '';
 
@@ -192,6 +200,26 @@
     window.addEventListener('click', (e) => {
         if (e.target === editModal) {
             editModal.classList.add('hidden');
+        }
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchForm.submit();
+        }, 500); // Submit after 500ms of no typing
+    });
+
+    // Submit on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            searchForm.submit();
         }
     });
 </script>

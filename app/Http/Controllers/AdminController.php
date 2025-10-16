@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\Site;
-use App\Models\Maintanance;
+use Illuminate\Http\Request; 
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\DB; 
+use App\Models\User; 
+use App\Models\Site; 
+use App\Models\Maintanance; 
 use Carbon\Carbon;
+
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
+
     {
         if (!session()->has('user_id')) {
             return redirect()->route('login')->withErrors(['login' => 'Silakan login terlebih dahulu!']);
@@ -21,50 +23,89 @@ class AdminController extends Controller
 
         $today = Carbon::now();
 
-        // Jika hari ini tanggal 1, update progres jadi "Belum Visit"
+        // === Reset progres setiap tanggal 1 ===
         if ($today->day === 1) {
-            Maintenance::where('progres', 'Visit')->update(['progres' => 'Belum Visit']);
+            Site::where('progres', 'Sudah Visit')->update(['progres' => 'Belum Visit']);
         }
-        
-        $totalSites = DB::table('sites')->count();
 
-        $totalVisit = DB::table('maintenances')->where('progres', 'Visit')->count();
-        $totalNotVisit = DB::table('maintenances')->where('progres', 'Belum Visit')->count();
+        // === Filter parameters (aman jika $request = null) ===
+        $serviceArea = $request->query('service_area');
+        $sto = $request->query('sto');
+
+        $baseQuery = Site::query();
+
+        if ($serviceArea) {
+            $baseQuery->where('service_area', $serviceArea);
+        }
+
+        if ($sto) {
+            $baseQuery->where('sto', $sto);
+        }
+        // === Statistik umum ===
+        $totalSites = (clone $baseQuery)->count();
+        $totalVisit = (clone $baseQuery)->where('progres', 'Sudah Visit')->count();
+        $totalNotVisit = (clone $baseQuery)->where('progres', 'Belum Visit')->count();
+
         $visitPercentage = $totalSites > 0
             ? round(($totalVisit / $totalSites) * 100, 2)
             : 0;
 
+        // === Produk yang tersedia ===
         $products = ['INTERSITE FO', 'MMP'];
         $chartData = [];
 
-        $daysInMonth = Carbon::now()->daysInMonth;
-        $startOfMonth = Carbon::now()->startOfMonth();
+        $daysInMonth = $today->daysInMonth;
+        $startOfMonth = $today->copy()->startOfMonth();
 
-        // === Tambahan: Data tabel berdasarkan Service Area & STO ===
-        $summary = Site::select(
-                'service_area',
-                'sto',
-                DB::raw("SUM(CASE WHEN maintenances.progres = 'Visit' AND sites.product = 'INTERSITE FO' THEN 1 ELSE 0 END) as visited_fo"),
-                DB::raw("SUM(CASE WHEN maintenances.progres = 'Visit' AND sites.product = 'MMP' THEN 1 ELSE 0 END) as visited_mmp"),
-                DB::raw("SUM(CASE WHEN maintenances.progres = 'Belum Visit' AND sites.product = 'INTERSITE FO' THEN 1 ELSE 0 END) as notvisit_fo"),
-                DB::raw("SUM(CASE WHEN maintenances.progres = 'Belum Visit' AND sites.product = 'MMP' THEN 1 ELSE 0 END) as notvisit_mmp"),
+        // === TABEL REKAP PER STO ===
+        $summaryRaw = Site::select(
+                'sites.service_area',
+                'sites.sto',
+                DB::raw("COALESCE(technicians.jumlah_teknisi, 0) as jumlah_teknisi"),
+                DB::raw("SUM(CASE WHEN sites.progres = 'Sudah Visit' AND DATE(sites.tgl_visit) = CURDATE() THEN 1 ELSE 0 END) as visited_today"),
+                DB::raw("SUM(CASE WHEN sites.progres = 'Sudah Visit' AND sites.product = 'INTERSITE FO' THEN 1 ELSE 0 END) as visited_fo"),
+                DB::raw("SUM(CASE WHEN sites.progres = 'Sudah Visit' AND sites.product = 'MMP' THEN 1 ELSE 0 END) as visited_mmp"),
+                DB::raw("SUM(CASE WHEN sites.progres = 'Belum Visit' AND sites.product = 'INTERSITE FO' THEN 1 ELSE 0 END) as notvisit_fo"),
+                DB::raw("SUM(CASE WHEN sites.progres = 'Belum Visit' AND sites.product = 'MMP' THEN 1 ELSE 0 END) as notvisit_mmp"),
                 DB::raw("COUNT(sites.id) as total")
             )
-            ->leftJoin('maintenances', 'maintenances.site_id', '=', 'sites.id')
-            ->groupBy('service_area', 'sto')
-            ->orderBy('service_area')
+            ->leftJoin('technicians', 'technicians.sto', '=', 'sites.sto')
+            ->groupBy('sites.service_area', 'sites.sto', 'technicians.jumlah_teknisi')
+            ->orderBy('sites.service_area')
             ->get();
 
-        // Ambil total site dari bulan lalu (berdasarkan created_at)
+        // Hitung persentase & keterangan di controller
+        $summary = $summaryRaw->map(function ($item) {
+            $grandTotal = (int) $item->total;
+            $visited = (int) $item->visited_fo + (int) $item->visited_mmp;
+
+            $percent = $grandTotal > 0 ? ($visited / $grandTotal) * 100 : 0;
+
+            if ($percent == 100) {
+                $status = 'Achieved';
+            } elseif ($percent >= 0 && $percent <= 1) {
+                $status = 'Belum Terassign';
+            } elseif ($percent > 1 && $percent < 100) {
+                $status = 'Progressing';
+            } else {
+                $status = '-';
+            }
+
+            $item->percent = round($percent, 2);
+            $item->keterangan = $status;
+
+            return $item;
+        });
+
+        // === Perbandingan dengan bulan lalu ===
         $lastMonth = Carbon::now()->subMonth();
         $lastMonthTotal = Site::whereMonth('created_at', $lastMonth->month)
             ->whereYear('created_at', $lastMonth->year)
             ->count();
 
-        // Hitung selisih
         $growth = $totalSites - $lastMonthTotal;
 
-        // Tentukan warna indikator
+        // === Warna & ikon indikator ===
         if ($growth > 0) {
             $color = 'text-green-500';
             $icon = 'trending_up';
@@ -75,64 +116,77 @@ class AdminController extends Controller
             $color = 'text-gray-700';
             $icon = 'trending_flat';
         }
-        
+
+        // Visit TREND (gunakan query yang sama filter ?)
+        $todayVisit = (clone $baseQuery)
+            ->where('progres', 'Sudah Visit')
+            ->whereDate('tgl_visit', Carbon::today())
+            ->count();
+
+        $yesterdayVisit = (clone $baseQuery)
+            ->where('progres', 'Sudah Visit')
+            ->whereDate('tgl_visit', Carbon::yesterday())
+            ->count();
+
+        $growthVisit = $todayVisit - $yesterdayVisit;
+        $colorVisit = $growthVisit > 0 ? 'text-green-500' : ($growthVisit < 0 ? 'text-red-500' : 'text-gray-700');
+        $iconVisit = $growthVisit > 0 ? 'trending_up' : ($growthVisit < 0 ? 'trending_down' : 'trending_flat');
+
+        $growthNotVisit = $todayVisit;
+
+        // Data grafik per produk
         foreach ($products as $product) {
-            $visited = DB::table('maintenances')
-                ->join('sites', 'maintenances.site_id', '=', 'sites.id')
-                ->where('sites.product', $product)
-                ->where('maintenances.progres', 'Visit')
+            $visited = (clone $baseQuery)->where('product', $product)
+                ->where('progres', 'Sudah Visit')
                 ->count();
 
-            $notVisited = DB::table('maintenances')
-                ->join('sites', 'maintenances.site_id', '=', 'sites.id')
-                ->where('sites.product', $product)
-                ->where('maintenances.progres', 'Belum Visit')
+            $notVisited = (clone $baseQuery)->where('product', $product)
+                ->where('progres', 'Belum Visit')
                 ->count();
-
-            $total = $visited + $notVisited;
-            if ($total == 0) {
-                $visited = 0;
-                $notVisited = 0;
-            }
 
             $chartData[$product] = [
                 'visited' => $visited,
                 'notVisited' => $notVisited,
             ];
-
-            // Ambil data visit per tanggal dalam bulan ini
-            $visitsPerDay = DB::table('maintenances')
-                ->select(DB::raw('DATE(tngl_visit) as date'), DB::raw('COUNT(*) as count'))
-                ->whereMonth('tngl_visit', Carbon::now()->month)
-                ->where('progres', 'Visit')
-                ->groupBy(DB::raw('DATE(tngl_visit)'))
-                ->pluck('count', 'date')
-                ->toArray();
-
-            // Siapkan array untuk grafik (agar tetap 31 hari meski ada yang kosong)
-            $dailyVisits = [];
-            for ($i = 1; $i <= $daysInMonth; $i++) {
-                $date = $startOfMonth->copy()->addDays($i - 1)->toDateString();
-                $dailyVisits[] = $visitsPerDay[$date] ?? 0;
-            }
-
-            // Target = total sites / jumlah hari
-            $dailyTarget = $daysInMonth > 0 ? round($totalSites / $daysInMonth, 2) : 0;
-            
-            return view('dashboard', [
-                'totalSites' => $totalSites,
-                'visitedSites' => $totalVisit,
-                'notVisitedSites' => $totalNotVisit,
-                'visitPercentage' => $visitPercentage,
-                'chartData' => $chartData,
-                'dailyVisits' => $dailyVisits,
-                'dailyTarget' => $dailyTarget,
-                'daysInMonth' => $daysInMonth,
-                'summary' => $summary,
-                'growth' => $growth,
-                'color' => $color,
-                'icon' => $icon,
-            ]);
         }
+
+        // Visit per tanggal (bulan berjalan)
+        $visitsPerDay = (clone $baseQuery)
+            ->select(DB::raw('DATE(tgl_visit) as date'), DB::raw('COUNT(*) as count'))
+            ->whereMonth('tgl_visit', Carbon::now()->month)
+            ->where('progres', 'Sudah Visit')
+            ->groupBy(DB::raw('DATE(tgl_visit)'))
+            ->pluck('count', 'date')
+            ->toArray();
+
+        $dailyVisits = [];
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $date = $startOfMonth->copy()->addDays($i - 1)->toDateString();
+            $dailyVisits[] = $visitsPerDay[$date] ?? 0;
+        }
+
+        $dailyTarget = $daysInMonth > 0 ? round($totalSites / $daysInMonth, 2) : 0;
+
+        // Kirim data ke view
+        return view('dashboard', [
+            'totalSites' => $totalSites,
+            'visitedSites' => $totalVisit,
+            'notVisitedSites' => $totalNotVisit,
+            'visitPercentage' => $visitPercentage,
+            'chartData' => $chartData,
+            'dailyVisits' => $dailyVisits,
+            'dailyTarget' => $dailyTarget,
+            'daysInMonth' => $daysInMonth,
+            'summary' => $summary,
+            'growth' => $growth,
+            'color' => $color,
+            'icon' => $icon,
+            'colorVisit' => $colorVisit,
+            'iconVisit' => $iconVisit,
+            'growthVisit' => $growthVisit,
+            'growthNotVisit' => $growthNotVisit,
+            'selectedServiceArea' => $serviceArea,
+            'selectedSto' => $sto,
+        ]);
     }
 }
