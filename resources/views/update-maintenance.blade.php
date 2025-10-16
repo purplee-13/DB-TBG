@@ -2,10 +2,11 @@
 
 @section('content')
 <div class="p-6">
-
     {{-- Notifikasi --}}
     @if(session('success'))
-        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">{{ session('success') }}</div>
+        <div id="success-alert" class="mb-4 px-4 py-3 rounded bg-green-100 text-green-800 border border-green-300">
+            {{ session('success') }}
+        </div>
     @endif
     @if($errors->any())
         <div class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
@@ -220,6 +221,16 @@
         if (e.key === 'Enter') {
             clearTimeout(searchTimeout);
             searchForm.submit();
+        }
+    });
+
+    // Auto-hide success alert after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
         }
     });
 </script>

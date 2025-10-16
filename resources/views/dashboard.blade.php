@@ -1,6 +1,58 @@
 @extends('layouts.admin')
 
 @section('content')
+<!-- GANTI: style shadow untuk semua item dalam grid -->
+<style>
+    /* filepath: c:\Users\asus\DB-TBG\resources\views\dashboard.blade.php */
+    /* Base: posisi dan transisi untuk kartu */
+    .grid > * {
+        position: relative;            /* diperlukan untuk pseudo-element glow */
+        overflow: visible;             /* pastikan bayangan tidak terpotong */
+        border-radius: 0.75rem;        /* rounded-xl konsisten */
+        transition: transform 220ms cubic-bezier(.2,.8,.2,1), 
+                    box-shadow 220ms cubic-bezier(.2,.8,.2,1), 
+                    opacity 220ms;
+    }
+
+    /* Kartu default shadow (lebih kentara) */
+    .grid > * {
+        box-shadow: 0 14px 40px rgba(2, 44, 184, 0.08), 0 6px 18px rgba(0,0,0,0.06);
+        background-clip: padding-box;
+    }
+
+    /* Hover: efek lift dan shadow lebih tebal */
+    .grid > *:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 30px 70px rgba(2, 44, 184, 0.12), 0 14px 28px rgba(0,0,0,0.10);
+        z-index: 10;
+    }
+
+    /* Soft colored glow menggunakan pseudo-element */
+    .grid > *::before {
+        content: "";
+        position: absolute;
+        inset: -6px; /* sedikit meluas keluar untuk glow */
+        border-radius: inherit;
+        background: linear-gradient(120deg, rgba(34,197,94,0.04), rgba(37,99,235,0.03) 50%, rgba(239,68,68,0.02));
+        filter: blur(14px);
+        opacity: 0.9;
+        pointer-events: none;
+        transition: opacity 220ms, transform 220ms;
+    }
+    .grid > *:hover::before {
+        transform: scale(1.03);
+        opacity: 1;
+    }
+
+    /* Target elemen .bg-white untuk variasi warna bayangan */
+    .grid .bg-white {
+        box-shadow: 0 16px 48px rgba(2, 44, 184, 0.07), 0 8px 22px rgba(0,0,0,0.06);
+    }
+
+    /* Pastikan elemen dengan rounded-xl tetap rapi */
+    .rounded-xl { overflow: visible; }
+</style>
+
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-3xl font-bold">Selamat Datang, {{ session('name') }}</h2>
         <div class="flex gap-4">

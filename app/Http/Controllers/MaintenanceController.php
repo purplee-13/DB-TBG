@@ -96,7 +96,7 @@ class MaintenanceController extends Controller
         ]);
 
         $site = Site::findOrFail($id);
-        
+
         // Debug: Log the request data
         \Log::info('Update request data:', $request->all());
         \Log::info('Site ID:', ['id' => $id]);
@@ -105,7 +105,7 @@ class MaintenanceController extends Controller
             'teknisi', 'tgl_visit', 'progres', 'operator', 'keterangan'
         ]));
 
-        return redirect()->route('maintenance.index')->with('success','Data site berhasil diperbarui.');
+        return redirect()->route('update-maintenance')->with('success','Update berhasil disimpan.');
     }
 
     public function destroy(Maintenance $maintenance)
