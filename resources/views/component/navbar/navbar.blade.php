@@ -1,6 +1,10 @@
 <nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between relative">
     <div class="flex items-center gap-3">
-        <div><a href="{{ url('/dashboard') }}"><img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10"></a></div>
+        <div>
+            <a href="{{ url('/dashboard') }}">
+                <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="h-10">
+            </a>
+        </div>
         <div class="flex items-center gap-1">
             <span class="material-symbols-outlined text-[#022CB8]">calendar_clock</span>
             <p class="text-sm text-[#022CB8]"><span id="current-date"></span>, <span id="current-time"></span></p>
@@ -23,11 +27,22 @@
             </div>
         </div>
 
-        {{-- Popup Logout --}}
-        <div id="logout-popup" class="hidden absolute right-0 top-12 bg-white shadow-lg border rounded-xl py-2 w-36 z-50">
-            <form method="POST" action="{{ route('logout') }}" class="text-center">
+        {{-- Popup Profil & Logout --}}
+        <div id="logout-popup" class="hidden absolute right-0 top-12 bg-white shadow-lg border rounded-xl py-3 w-56 z-50">
+            {{-- Info Profil --}}
+            <div class="px-4 pb-2 border-b border-gray-200 text-left">
+                <p class="font-semibold text-gray-800 text-sm">{{ session('name') }}</p>
+                <p class="text-gray-500 text-xs">{{ session('email') }}</p>
+                @if (session('role'))
+                    <p class="text-gray-500 text-xs italic">{{ ucfirst(session('role')) }}</p>
+                @endif
+            </div>
+
+            {{-- Tombol Logout --}}
+            <form method="POST" action="{{ route('logout') }}" class="text-center mt-2">
                 @csrf
-                <button type="submit" class="w-full text-red-600 hover:bg-red-50 py-2 rounded-lg transition-all duration-200">
+                <button type="submit"
+                    class="w-full text-red-600 hover:bg-red-50 py-2 rounded-lg transition-all duration-200">
                     <span class="material-symbols-outlined align-middle text-red-600">logout</span>
                     Logout
                 </button>

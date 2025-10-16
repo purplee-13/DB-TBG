@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
@@ -15,16 +16,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
+        // Data user yang akan disimpan
+        $users = [
             [
                 'username' => 'master01',
                 'name' => 'Master',
                 'email' => 'master@example.com',
                 'password' => Hash::make('Password_123'),
                 'role' => 'master',
-                'remember_token' => Str::random(10),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
                 'username' => 'admin01',
@@ -32,9 +31,6 @@ class UserSeeder extends Seeder
                 'email' => 'admin@example.com',
                 'password' => Hash::make('Password_123'),
                 'role' => 'admin',
-                'remember_token' => Str::random(10),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
             [
                 'username' => 'ingridd01',
@@ -42,10 +38,19 @@ class UserSeeder extends Seeder
                 'email' => 'ingridd@example.com',
                 'password' => Hash::make('Password_123'),
                 'role' => 'pegawai',
-                'remember_token' => Str::random(10),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ],
-        ]);
+        ];
+
+        // Looping untuk insert/update tanpa error duplicate
+        foreach ($users as $user) {
+            User::updateOrCreate(
+                ['username' => $user['username']], // jika username sudah ada → update
+                array_merge($user, [
+                    'remember_token' => Str::random(10),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ])
+            );
+        }
     }
 }

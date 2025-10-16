@@ -241,5 +241,25 @@
             }, 5000);
         }
     });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchForm.submit();
+        }, 500); // Submit after 500ms of no typing
+    });
+
+    // Submit on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            searchForm.submit();
+        }
+    });
 </script>
 @endsection
