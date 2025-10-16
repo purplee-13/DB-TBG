@@ -78,15 +78,18 @@ class SiteController extends Controller
 
     public function deleteMultiple(Request $request)
     {
-        $ids = $request->input('ids');
-
-        if (!$ids || !is_array($ids)) {
-            return response()->json(['success' => false, 'message' => 'ID tidak valid']);
+        $ids = $request->input('ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih.'], 400);
         }
-
-        Site::whereIn('id', $ids)->delete();
-
-        return response()->json(['success' => true]);
+    
+        try {
+            Site::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error('DeleteMultiple error: '.$e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Server error.'], 500);
+        }
     }
 
 }

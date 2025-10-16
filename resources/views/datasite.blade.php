@@ -195,7 +195,9 @@
 
 <script>
     let sites = @json($sites);
-    let role = @json(session('role')); 
+    let role = @json(session('role')); // ✅ kirim role ke JS
+        // Ambil CSRF token dari meta
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
@@ -263,20 +265,20 @@
         renderTable(filtered);
     }
 
-    // ✅ renderTable fix - kolom aksi tidak hilang
+    // Render table (dengan checkbox dan aksi dinamis)
     function renderTable(data) {
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
         data.forEach((site, index) => {
             let row = `
                 <tr>
-                    <td class='py-2 px-4'>${index + 1}</td>
-                    <td class='py-2 px-4'>${site.site_code}</td>
-                    <td class='py-2 px-4'>${site.site_name}</td>
-                    <td class='py-2 px-4'>${site.service_area}</td>
-                    <td class='py-2 px-4'>${site.sto}</td>
-                    <td class='py-2 px-4'>${site.product}</td>
-                    <td class='py-2 px-4'>${site.tikor}</td>
+                    <td class='py-2 px-4 text-sm'>${index + 1}</td>
+                    <td class='py-2 px-4 text-sm'>${site.site_code}</td>
+                    <td class='py-2 px-4 text-sm'>${site.site_name}</td>
+                    <td class='py-2 px-4 text-sm'>${site.service_area}</td>
+                    <td class='py-2 px-4 text-sm'>${site.sto}</td>
+                    <td class='py-2 px-4 text-sm'>${site.product}</td>
+                    <td class='py-2 px-4 text-sm'>${site.tikor ?? ''}</td>
             `;
 
             if (role === 'admin' || role === 'master') {
@@ -286,13 +288,13 @@
                             <i class='fas fa-pen'></i>
                         </button>
                         <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                            <input type='hidden' name='_token' value='${csrfToken}'>
                             <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
                                 <i class='fas fa-trash'></i>
                             </button>
                         </form>
                     </td>
-                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
+                    <td class='py-2 px-4 text-center'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                 `;
             }
 
@@ -300,20 +302,24 @@
             tableBody.innerHTML += row;
         });
 
-        // Re-bind selectAll behavior for dynamic rows
-        const selectAll = document.getElementById('selectAll');
-        if (selectAll) {
-            selectAll.checked = false;
-            selectAll.addEventListener('change', function() {
+        // Setup selectAll checkbox (yang sekarang ada di thead sebagai #selectAllCheckbox)
+        const selectAllInput = document.getElementById('selectAllCheckbox');
+        if (selectAllInput) {
+            selectAllInput.checked = false;
+            selectAllInput.addEventListener('change', function() {
                 const checked = this.checked;
                 document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
             });
         }
 
-        // Bulk delete button
+        // Bulk delete button binding (unbind previous listener to avoid duplikasi)
         const bulkBtn = document.getElementById('bulkDeleteBtn');
         if (bulkBtn) {
-            bulkBtn.addEventListener('click', async function() {
+            // remove previous listeners by cloning
+            const newBulk = bulkBtn.cloneNode(true);
+            bulkBtn.parentNode.replaceChild(newBulk, bulkBtn);
+
+            newBulk.addEventListener('click', async function() {
                 const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
                 if (selected.length === 0) {
                     alert('Pilih minimal satu data untuk dihapus.');
@@ -322,7 +328,9 @@
                 if (!confirm('Yakin ingin menghapus ' + selected.length + ' data terpilih?')) return;
 
                 try {
-                    const res = await fetch('{{ route('datasite.deleteMultiple') }}', {
+                    // route blade rendered server-side
+                    const url = "{{ route('datasite.deleteMultiple') }}";
+                    const res = await fetch(url, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -331,11 +339,26 @@
                         },
                         body: JSON.stringify({ ids: selected })
                     });
+
+                    if (!res.ok) {
+                        // jika status 419 -> CSRF, 500 -> server error
+                        const text = await res.text();
+                        console.error('Network error:', res.status, text);
+                        alert('Gagal menghapus data. Periksa console (Network) untuk detail. Status: ' + res.status);
+                        return;
+                    }
+
                     const json = await res.json();
                     if (json.success) {
-                        location.reload();
+                        // hapus rows dari JS tanpa reload atau reload halaman:
+                        // location.reload();
+                        // lebih halus: hapus dari array sites lalu re-render
+                        sites = sites.filter(s => !selected.includes(String(s.id)));
+                        renderTable(sites);
+                        alert('Berhasil menghapus ' + selected.length + ' data.');
                     } else {
-                        alert(json.message || 'Terjadi kesalahan saat menghapus.');
+                        console.error('Server response:', json);
+                        alert(json.message || 'Terjadi kesalahan pada server.');
                     }
                 } catch (err) {
                     console.error(err);
@@ -344,6 +367,8 @@
             });
         }
     }
+
+    // Initial render
     renderTable(sites);
 
     function clearSearch() {
