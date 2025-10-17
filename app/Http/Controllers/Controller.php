@@ -2,7 +2,57 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Site;
+use App\Models\Maintenance;
+
+class Controller extends BaseController
 {
-    //
+    use AuthorizesRequests, ValidatesRequests;
+
+    // Halaman login
+    public function login()
+    {
+        return view('login');
+    }
+
+    // Proses login
+    public function loginPost(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            // Login sukses
+            return redirect()->route('dashboard');
+        }
+        // Login gagal
+        return back()->withErrors(['email' => 'Login gagal!']);
+    }
+
+    // Logout
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login');
+    }
+
+    
+    // 🟢 Simpan Data Maintenance
+    public function storeMaintenance(Request $request)
+    {
+        $request->validate([
+            'site_id' => 'required|exists:sites,id',
+            'technician' => 'required',
+            'visit_date' => 'required|date',
+            'status' => 'required',
+            'operator' => 'nullable',
+            'description' => 'nullable',
+            'notes' => 'nullable',
+        ]);
+        Maintenance::create($request->all());
+        return redirect()->route('update.maintenance')->with('success', 'Data maintenance berhasil disimpan!');
+    }
 }
