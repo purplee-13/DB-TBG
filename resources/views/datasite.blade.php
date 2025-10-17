@@ -47,48 +47,52 @@
     {{-- =================== TABLE =================== --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
         <div style="max-height:595px; overflow-y:auto;">
-            <table class="min-w-full text-sm" id="sitesTable">
+            <table class="min-w-full text-sm table-fixed" id="sitesTable">
                 <thead class="bg-blue-600 text-white" style="position:sticky;top:0;z-index:2;">
                     <tr>
-                        <th class="py-3 px-4 text-left">NO</th>
-                        <th class="py-3 px-4 text-left">Site ID</th>
-                        <th class="py-3 px-4 text-left">Site Name</th>
-                        <th class="py-3 px-4 text-left">Service Area</th>
-                        <th class="py-3 px-4 text-left">STO</th>
-                        <th class="py-3 px-4 text-left">Product</th>
-                        <th class="py-3 px-4 text-left">Tikor</th>
+                        <th class="py-3 px-4 text-left w-12">NO</th>
+                        <th class="py-3 px-4 text-left w-20">Site ID</th>
+                        <th class="py-3 px-4 text-left w-64">Site Name</th>
+                        <th class="py-3 px-4 text-left w-32">Service Area</th>
+                        <th class="py-3 px-4 text-left w-28">STO</th>
+                        <th class="py-3 px-4 text-left w-28">Product</th>
+                        <th class="py-3 px-4 text-left w-36">Tikor</th>
                         {{-- Kolom Aksi hanya muncul untuk admin dan master --}}
                         @if(session('role') == 'admin' || session('role') == 'master')
-                            <th class="py-2 px-4 text-center">Aksi</th>
-                            <th class="py-3 px-4 text-center" id="selectAll">Pilih</th>
+                            <th class="py-2 px-4 text-center w-36">Aksi</th>
+                            <th class="py-3 px-4 text-center">
+                                <input type="checkbox" id="selectAllCheckbox" class="mx-auto" title="Pilih Semua">
+                            </th>
                         @endif
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y">
                     @foreach ($sites as $index => $site)
                     <tr>
-                        <td class="py-2 px-4">{{ $index + 1 }}</td>
-                        <td class="py-2 px-4">{{ $site->site_code }}</td>
-                        <td class="py-2 px-4">{{ $site->site_name }}</td>
-                        <td class="py-2 px-4">{{ $site->service_area }}</td>
-                        <td class="py-2 px-4">{{ $site->sto }}</td>
-                        <td class="py-2 px-4">{{ $site->product }}</td>
-                        <td class="py-2 px-4">{{ $site->tikor }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $index + 1 }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $site->site_code }}</td>
+                        <td class="py-2 px-4 truncate">{{ $site->site_name }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $site->service_area }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $site->sto }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $site->product }}</td>
+                        <td class="py-2 px-4 whitespace-nowrap">{{ $site->tikor }}</td>
 
                         {{-- Tombol aksi hanya muncul untuk admin dan master --}}
                         @if(session('role') == 'admin' || session('role') == 'master')
-                        <td class="py-2 px-4 text-center flex justify-center gap-3">
-                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <form method="POST" action="{{ route('datasite.delete', $site->id) }}" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800 delete-btn" title="Hapus">
-                                    <i class="fas fa-trash"></i>
+                        <td class="py-2 px-4 text-center align-middle w-36 whitespace-nowrap">
+                            <div class="inline-flex items-center justify-center gap-2 whitespace-nowrap">
+                                <button class="action-btn edit-btn w-8 h-8 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-50" title="Edit" onclick="openEditModal({{ $site->id }})">
+                                    <i class="fas fa-pen"></i>
                                 </button>
-                            </form>
+                                <form method="POST" action="{{ route('datasite.delete', $site->id) }}" class="inline-block m-0 p-0" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                    @csrf
+                                    <button type="submit" class="action-btn w-8 h-8 flex items-center justify-center rounded-md text-red-600 hover:bg-red-50" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
-                        <td class="py-2 px-4 text-center"><input type="checkbox" class="row-checkbox" value="{{ $site->id }}"></td>
+                        <td class="py-2 px-4 text-center align-middle"><input type="checkbox" class="row-checkbox" value="{{ $site->id }}"></td>
                         @endif
                     </tr>
                     @endforeach
@@ -215,8 +219,10 @@
 </div>
 
 <script>
-    let sites = @json($sites);
-    let role = @json(session('role'));
+    const csrfToken = '{{ csrf_token() }}';
+    const deleteMultipleUrl = '{{ route('datasite.deleteMultiple') }}';
+    let sites = {!! json_encode($sites) !!};
+    let role = {!! json_encode(session('role')) !!};
 
     function openEditModal(siteId) {
         const site = sites.find(s => s.id === siteId);
@@ -281,18 +287,20 @@
 
             if (role === 'admin' || role === 'master') {
                 row += `
-                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
-                        <button class='text-blue-600 hover:text-blue-800' title='Edit' onclick='openEditModal(${site.id})'>
-                            <i class='fas fa-pen'></i>
-                        </button>
-                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                            <input type='hidden' name='_token' value='{{ csrf_token() }}'>
-                            <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
-                                <i class='fas fa-trash'></i>
+                    <td class='py-2 px-4 text-center align-middle w-36 whitespace-nowrap'>
+                        <div class='inline-flex items-center justify-center gap-2 whitespace-nowrap'>
+                            <button class='action-btn edit-btn w-8 h-8 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-50' title='Edit' onclick='openEditModal(${site.id})'>
+                                <i class='fas fa-pen'></i>
                             </button>
-                        </form>
+                            <form method='POST' action='/datasite/${site.id}/delete' class='inline-block m-0 p-0' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                <input type='hidden' name='_token' value='${csrfToken}'>
+                                <button type='submit' class='action-btn w-8 h-8 flex items-center justify-center rounded-md text-red-600 hover:bg-red-50' title='Hapus'>
+                                    <i class='fas fa-trash'></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
-                    <td class='py-2 px-4'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
+                    <td class='py-2 px-4 text-center align-middle whitespace-nowrap'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
                 `;
             }
 
@@ -301,19 +309,21 @@
         });
 
         // Re-bind selectAll behavior for dynamic rows
-        const selectAll = document.getElementById('selectAll');
-        if (selectAll) {
-            selectAll.checked = false;
-            selectAll.addEventListener('change', function() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            // use onchange assignment to avoid duplicate listeners when re-rendering
+            selectAllCheckbox.onchange = function() {
                 const checked = this.checked;
                 document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
-            });
+            };
         }
 
         // Bulk delete button
         const bulkBtn = document.getElementById('bulkDeleteBtn');
         if (bulkBtn) {
-            bulkBtn.addEventListener('click', async function() {
+            // assign onclick to avoid stacking listeners on repeated renders
+            bulkBtn.onclick = async function() {
                 const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
                 if (selected.length === 0) {
                     alert('Pilih minimal satu data untuk dihapus.');
@@ -322,7 +332,7 @@
                 if (!confirm('Yakin ingin menghapus ' + selected.length + ' data terpilih?')) return;
 
                 try {
-                    const res = await fetch('{{ route('datasite.deleteMultiple') }}', {
+                    const res = await fetch(deleteMultipleUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -341,7 +351,7 @@
                     console.error(err);
                     alert('Gagal menghapus data. Cek console untuk detail.');
                 }
-            });
+            };
         }
     }
     renderTable(sites);

@@ -46,46 +46,46 @@ Route::get('/update-maintenance', [MaintenanceController::class, 'index'])->name
 Route::put('/maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');
 
 // Temporary dev helpers (only in local environment)
-if (app()->environment('local')) {
-    Route::get('/dev-login/{username}', function ($username) {
-        $user = \App\Models\User::where('username', $username)->first();
-        if (! $user) {
-            abort(404, 'User not found');
-        }
+// if (app()->environment('local')) {
+//     Route::get('/dev-login/{username}', function ($username) {
+//         $user = \App\Models\User::where('username', $username)->first();
+//         if (! $user) {
+//             abort(404, 'User not found');
+//         }
 
-        session([
-            'user_id' => $user->id,
-            'username' => $user->username,
-            'name' => $user->name,
-            'role' => $user->role,
-        ]);
+//         session([
+//             'user_id' => $user->id,
+//             'username' => $user->username,
+//             'name' => $user->name,
+//             'role' => $user->role,
+//         ]);
 
-        return redirect()->route('dashboard');
-    })->name('dev.login');
+//         return redirect()->route('dashboard');
+//     })->name('dev.login');
 
-    Route::get('/dashboard-test', function () {
-        if (! session()->has('user_id')) {
-            return response()->json(['logged_in' => false, 'session' => session()->all()]);
-        }
-        return response()->json(['logged_in' => true, 'session' => session()->only(['user_id','username','name','role'])]);
-    });
+//     Route::get('/dashboard-test', function () {
+//         if (! session()->has('user_id')) {
+//             return response()->json(['logged_in' => false, 'session' => session()->all()]);
+//         }
+//         return response()->json(['logged_in' => true, 'session' => session()->only(['user_id','username','name','role'])]);
+//     });
 
-    // Dev: quick update user for testing (local only)
-    Route::get('/dev-update-user/{id}', function ($id, \Illuminate\Http\Request $request) {
-        $user = \App\Models\User::find($id);
-        if (! $user) return response()->json(['ok' => false, 'message' => 'User not found'], 404);
+//     // Dev: quick update user for testing (local only)
+//     Route::get('/dev-update-user/{id}', function ($id, \Illuminate\Http\Request $request) {
+//         $user = \App\Models\User::find($id);
+//         if (! $user) return response()->json(['ok' => false, 'message' => 'User not found'], 404);
 
-        $name = $request->query('name');
-        $username = $request->query('username');
-        $role = $request->query('role');
-        $password = $request->query('password');
+//         $name = $request->query('name');
+//         $username = $request->query('username');
+//         $role = $request->query('role');
+//         $password = $request->query('password');
 
-        if ($name) $user->name = $name;
-        if ($username) $user->username = $username;
-        if ($role) $user->role = strtolower($role);
-        if ($password) $user->password = bcrypt($password);
+//         if ($name) $user->name = $name;
+//         if ($username) $user->username = $username;
+//         if ($role) $user->role = strtolower($role);
+//         if ($password) $user->password = bcrypt($password);
 
-        $user->save();
-        return response()->json(['ok' => true, 'user' => $user]);
-    });
-}
+//         $user->save();
+//         return response()->json(['ok' => true, 'user' => $user]);
+//     });
+// }
