@@ -59,7 +59,7 @@
                         <th class="py-3 px-4 text-left">Tikor</th>
                         {{-- Kolom Aksi hanya muncul untuk admin dan master --}}
                         @if(session('role') == 'admin' || session('role') == 'master')
-                            <th class="py-2 px-4 text-center">Aksi</th>
+                            <th class="py-2 px-4 text-center w-36">Aksi</th>
                             <th class="py-3 px-4 text-center" id="selectAll">Pilih</th>
                         @endif
                     </tr>
@@ -77,13 +77,13 @@
 
                         {{-- Tombol aksi hanya muncul untuk admin dan master --}}
                         @if(session('role') == 'admin' || session('role') == 'master')
-                        <td class="py-2 px-4 text-center flex justify-center gap-3">
-                            <button class="text-blue-600 hover:text-blue-800 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})">
+                        <td class="py-2 px-4 text-center flex justify-center gap-2 whitespace-nowrap">
+                            <button class="text-blue-600 hover:text-blue-800 w-8 h-8 edit-btn" title="Edit" onclick="openEditModal({{ $site->id }})">
                                 <i class="fas fa-pen"></i>
                             </button>
-                            <form method="POST" action="{{ route('datasite.delete', $site->id) }}" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                            <form method="POST" action="{{ route('datasite.delete', $site->id) }}" style="display:inline-block m-0 p-0;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                 @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800 delete-btn" title="Hapus">
+                                <button type="submit" class="w-8 h-8 flex items-center justify-center text-red-600 hover:text-red-800 delete-btn" title="Hapus">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
