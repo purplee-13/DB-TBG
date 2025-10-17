@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -12,7 +13,7 @@ class UserController extends Controller
     {
         // Allow only users with role 'Master' to access any method in this controller.
         $this->middleware(function ($request, $next) {
-            $user = auth()->user();
+            $user = Auth::user();
 
             // Some parts of the app use custom session-based auth; also check session('role')
             $role = $user?->role ?? session('role');
@@ -20,7 +21,6 @@ class UserController extends Controller
             // Normalize role to lowercase for comparison (database uses lowercase values)
             $role = is_string($role) ? strtolower($role) : $role;
 
-            // Only master can manage users
             if ($role !== 'master') {
                 abort(403, 'Unauthorized - hanya Master yang dapat mengakses halaman ini.');
             }
@@ -42,8 +42,21 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'username' => 'required|string|max:100|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:20',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&_]/',
+            ],
             'role' => 'required|in:admin,pegawai'
+        ], [
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 20 karakter',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
         ]);
 
         User::create([
@@ -68,27 +81,38 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Validate input; username must be unique except for this user
         $request->validate([
             'name' => 'required|string|max:100',
-            'username' => 'required|string|max:100|unique:users,username,' . $id,
-            'password' => 'nullable|string|min:6',
+            'username' => "required|string|max:100|unique:users,username,{$id}",
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'max:20',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&_]/',
+            ],
             'role' => 'required|in:admin,pegawai'
+        ], [
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 20 karakter',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
         ]);
 
         $user->name = $request->name;
         $user->username = $request->username;
 
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            $user->password = Hash::make($request->password); // only update when provided
         }
 
         $user->role = strtolower($request->role);
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
+        return redirect()->back()->with('success', 'User berhasil diperbarui.');
     }
-
 
     // Hapus user
     public function destroy($id)

@@ -113,7 +113,7 @@
         <div class="col-span-1 bg-white p-4 rounded-xl shadow">
             <div class="grid grid-cols-2 gap-2">
                 <div class="flex items-center gap-4">
-                    <div class="text-left">
+                    <div class="text-left p-4">
                         <div class="flex items-center gap-2 mb-2">
                             <img src="{{ asset('assets/icon/persen.png') }}" alt="Persentase" class="w-8 h-8">
                             <h3 class="text-[#022CB8] font-semibold">Persentase</h3>
