@@ -1,22 +1,32 @@
-{{-- Notifikasi Sukses dan Gagal --}}
-@if (session('success'))
-    <div id="notif-success" class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
-        {{ session('success') }}
-    </div>
-@endif
-@if ($errors->any())
-    <div id="notif-error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
-        <ul class="list-disc pl-5">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
 @extends('layouts.admin')
 
 @section('content')
+<!-- ...existing code (navbar / header) ... -->
+
+{{-- ALERT: tampilkan di bawah navbar --}}
+@if(session('success') || session('error') || isset($alert))
+    @php
+        $msg = session('success') ?? session('error') ?? $alert;
+        $isError = session('error') ? true : false;
+    @endphp
+    <div id="success-alert" class="mb-4 px-4 py-3 rounded {{ $isError ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300' }}">
+        {{ $msg }}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alertEl = document.getElementById('success-alert');
+            if (alertEl) {
+                setTimeout(() => {
+                    alertEl.style.transition = 'opacity 400ms';
+                    alertEl.style.opacity = '0';
+                    setTimeout(() => alertEl.remove(), 500);
+                }, 5000); // 5 detik
+            }
+        });
+    </script>
+@endif
+
 <div class="p-6">
 
     {{-- =================== SEARCH & ADD =================== --}}
@@ -42,6 +52,12 @@
             <button id="bulkDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 items-center gap-1 p-1.5">Hapus Terpilih</button>
            
         @endif
+    </div>
+
+    {{-- Search Results Info (client-side) --}}
+    <div id="searchInfo" class="mb-4 text-sm text-gray-600 hidden">
+        <span class="font-medium" id="searchCount">0</span> hasil ditemukan untuk "<span class="font-medium" id="searchQuery"></span>"
+        <button type="button" onclick="clearSearch()" class="text-blue-600 hover:text-blue-800 ml-2">Tampilkan semua</button>
     </div>
 
     {{-- =================== TABLE =================== --}}
@@ -255,6 +271,9 @@
         const input = document.getElementById('searchInput').value.trim().toLowerCase();
         if (input === "") {
             renderTable(sites);
+            // hide search info when query empty
+            const info = document.getElementById('searchInfo');
+            if (info) info.classList.add('hidden');
             return;
         }
         const filtered = sites.filter(site => {
@@ -263,6 +282,15 @@
                 || String(site.service_area).toLowerCase().includes(input);
         });
         renderTable(filtered);
+        // show search info with count and query
+        const info = document.getElementById('searchInfo');
+        const countEl = document.getElementById('searchCount');
+        const queryEl = document.getElementById('searchQuery');
+        if (info && countEl && queryEl) {
+            countEl.textContent = String(filtered.length);
+            queryEl.textContent = document.getElementById('searchInput').value.trim();
+            info.classList.remove('hidden');
+        }
     }
 
     // Render table (dengan checkbox dan aksi dinamis)
@@ -374,6 +402,8 @@
     function clearSearch() {
         document.getElementById('searchInput').value = "";
         renderTable(sites);
+        const info = document.getElementById('searchInfo');
+        if (info) info.classList.add('hidden');
     }
 
     // Auto-hide notifikasi

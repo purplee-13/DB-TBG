@@ -38,7 +38,11 @@ class SiteController extends Controller
         $data = config('sto');
         $serviceAreas = array_keys($data);
         $stosByArea = $data;
-        return view('datasite', compact('sites', 'serviceAreas', 'stosByArea'));
+
+        // Ambil pesan flash jika ada dan teruskan ke view sebagai $alert
+        $alert = session('success') ?? session('error') ?? null;
+
+        return view('datasite', compact('sites', 'serviceAreas', 'stosByArea', 'alert'));
     }
 
     public function create()
