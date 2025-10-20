@@ -148,9 +148,9 @@
     </div>
 
     <div class="grid grid-cols-4 gap-6 mb-6">
-        <div class="bg-white p-4 rounded-xl shadow col-span-2">
-            <h4 class="font-semibold mb-3">Trend Visit PM CSA per Oktober</h4>
-            <div style="height: 300px;">
+        <div class="bg-white p-4 rounded-xl shadow col-span-2 flex flex-col items-center justify-center">
+            <h4  id="chartTitle" class="font-semibold mb-3">TREND VISIT PM CSA</h4>
+            <div class="flex items-center justify-center w-full" style="height: 300px;">
                 <canvas id="trendChart"></canvas>
             </div>
         </div>
@@ -306,6 +306,15 @@
     </div>
 
     <script>
+        // Ambil elemen judul
+        const titleElement = document.getElementById('chartTitle');
+
+        // Ambil bulan berjalan dalam bahasa Indonesia
+        const namaBulan = new Date().toLocaleString('id-ID', { month: 'long' });
+
+        // Set judul dinamis
+        titleElement.textContent = `TREND VISIT PM CSA per ${namaBulan.charAt(0).toUpperCase() + namaBulan.slice(1)}`;
+
         const visitData = @json($dailyVisits);
         const dailyTarget = @json($dailyTarget);
         const daysInMonth = @json($daysInMonth);
@@ -324,7 +333,7 @@
                         data: visitData,
                         borderColor: '#2563EB',
                         borderWidth: 3,
-                        fill: true,
+                        fill: false,
                         tension: 0.4,
                         pointBackgroundColor: '#2563EB',
                         pointBorderColor: '#fff',
@@ -348,7 +357,7 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        title: { display: true, text: 'Hari', color: '#374151', font: { weight: 'bold' } },
+                        title: { display: true, text: 'Tanggal', color: '#374151', font: { weight: 'bold' } },
                         grid: { color: 'rgba(0, 0, 0, 0.05)' }
                     },
                     y: {
@@ -385,6 +394,7 @@
                 },
                 options: {
                     responsive: true,
+                    aspectRatio: 1.2,
                     plugins: {
                         legend: { display: false }
                     }
@@ -394,19 +404,19 @@
             // Custom legend
             const legendContainer = document.getElementById(legendId);
             const legendHTML = `
-                <div class="flex items-center justify-between gap-6 mt-4">
+                <div class="flex flex-col items-center gap-2 mt-4">
                     <!-- Visit -->
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-green-500 text-sm">where_to_vote</span>
-                        <span class="font-medium text-xs">Sudah Visit: ${visit}</span>
-                        <span class="text-gray-400 text-xs"> ${((visit / total) * 100).toFixed(1)}%</span>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-3xl">where_to_vote</span>
+                        <span class="font-medium text-2xl">Sudah Visit: ${visit}</span>
+                        <span class="text-gray-400 text-2xl"> ${((visit / total) * 100).toFixed(1)}%</span>
                     </div>
 
                     <!-- Belum Visit -->
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-red-500 text-sm">location_off</span>
-                        <span class="font-medium text-xs">Belum Visit: ${notVisit}</span>
-                        <span class="text-gray-400 text-xs">${((notVisit / total) * 100).toFixed(1)}%</span>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-red-500 text-2xl">location_off</span>
+                        <span class="font-medium text-2xl">Belum Visit: ${notVisit}</span>
+                        <span class="text-gray-400 text-2xl">${((notVisit / total) * 100).toFixed(1)}%</span>
                     </div>
                 </div>
             `;
