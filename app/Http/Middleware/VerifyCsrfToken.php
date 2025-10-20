@@ -9,9 +9,12 @@ class VerifyCsrfToken extends Middleware
     /**
      * The URIs that should be excluded from CSRF verification.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $except = [
-        'telegram/webhook', // 🚀 tambahkan ini
+        // Tambahkan untuk ngrok dan development
+        'telegram/*',
+        'api/telegram/*',
     ];
 }
+    

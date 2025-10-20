@@ -324,7 +324,7 @@
                         data: visitData,
                         borderColor: '#2563EB',
                         borderWidth: 3,
-                        fill: true,
+                        fill: false,
                         tension: 0.4,
                         pointBackgroundColor: '#2563EB',
                         pointBorderColor: '#fff',
@@ -385,6 +385,7 @@
                 },
                 options: {
                     responsive: true,
+                    aspectRatio: 1.3, // <<--- memperkecil ukuran pie (semakin besar angka, semakin kecil pie)
                     plugins: {
                         legend: { display: false }
                     }
@@ -394,19 +395,19 @@
             // Custom legend
             const legendContainer = document.getElementById(legendId);
             const legendHTML = `
-                <div class="flex items-center justify-between gap-6 mt-4">
+                <div class="flex flex-col items-center gap-4 mt-4">
                     <!-- Visit -->
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-green-500 text-sm">where_to_vote</span>
-                        <span class="font-medium text-xs">Sudah Visit: ${visit}</span>
-                        <span class="text-gray-400 text-xs"> ${((visit / total) * 100).toFixed(1)}%</span>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-3xl">where_to_vote</span>
+                        <span class="font-medium text-2xl">Sudah Visit: ${visit}</span>
+                        <span class="text-gray-400 text-2xl"> ${((visit / total) * 100).toFixed(1)}%</span>
                     </div>
 
                     <!-- Belum Visit -->
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-red-500 text-sm">location_off</span>
-                        <span class="font-medium text-xs">Belum Visit: ${notVisit}</span>
-                        <span class="text-gray-400 text-xs">${((notVisit / total) * 100).toFixed(1)}%</span>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-red-500 text-2xl">location_off</span>
+                        <span class="font-medium text-2xl">Belum Visit: ${notVisit}</span>
+                        <span class="text-gray-400 text-2xl">${((notVisit / total) * 100).toFixed(1)}%</span>
                     </div>
                 </div>
             `;
