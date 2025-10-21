@@ -96,6 +96,7 @@ class MaintenanceController extends Controller
         ]);
 
         $site = Site::findOrFail($id);
+
         // Debug: Log the request data
         \Log::info('Update request data:', $request->all());
         \Log::info('Site ID:', ['id' => $id]);
