@@ -9,7 +9,7 @@
         position: relative;            /* diperlukan untuk pseudo-element glow */
         overflow: visible;             /* pastikan bayangan tidak terpotong */
         border-radius: 0.75rem;        /* rounded-xl konsisten */
-        transition: transform 220ms cubic-bezier(.2,.8,.2,1), 
+        transition: transform 220ms cubic-bezier(.2,.8,.2,1),
                     box-shadow 220ms cubic-bezier(.2,.8,.2,1), 
                     opacity 220ms;
     }
