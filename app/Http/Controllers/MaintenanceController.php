@@ -22,6 +22,11 @@ class MaintenanceController extends Controller
             });
         }
         
+        // Filter by date
+        if ($request->has('filter_date') && !empty($request->filter_date)) {
+            $query->whereDate('tgl_visit', $request->filter_date);
+        }
+        
         $sites = $query->orderByRaw("CASE WHEN progres = 'Belum Visit' THEN 0 ELSE 1 END")
                       ->orderBy('site_name', 'asc')
                       ->get();

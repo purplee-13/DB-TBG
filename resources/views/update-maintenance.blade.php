@@ -18,8 +18,8 @@
         </div>
     @endif
 
-    {{-- Search Bar --}}
-    <div class="flex justify-end items-center mb-4">
+    {{-- Search Bar & Date Filter --}}
+    <div class="flex justify-end items-center gap-3 mb-4">
         <form method="GET" action="{{ route('maintenance.index') }}" class="relative" id="searchForm">
             <input type="text" name="search" placeholder="Cari berdasarkan Site ID atau Site Name"
                 value="{{ request('search') }}"
@@ -29,17 +29,45 @@
                 <i class="fas fa-search"></i>
             </span>
             @if(request('search'))
-                <a href="{{ route('maintenance.index') }}" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+                <a href="{{ route('maintenance.index') }}@if(request('filter_date'))?filter_date={{ request('filter_date') }}@endif" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </a>
+            @endif
+            @if(request('filter_date'))
+                <input type="hidden" name="filter_date" value="{{ request('filter_date') }}">
+            @endif
+        </form>
+
+        {{-- Date Filter --}}
+        <form method="GET" action="{{ route('maintenance.index') }}" class="relative" id="dateFilterForm">
+            <input type="date" name="filter_date" 
+                value="{{ request('filter_date') }}"
+                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                id="dateFilterInput">
+            <span class="absolute left-3 top-2.5 text-gray-500">
+                <i class="fas fa-calendar-alt"></i>
+            </span>
+            @if(request('filter_date'))
+                <button type="button" onclick="clearDateFilter()" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            @endif
+            @if(request('search'))
+                <input type="hidden" name="search" value="{{ request('search') }}">
             @endif
         </form>
     </div>
 
     {{-- Search Results Info --}}
-    @if(request('search'))
+    @if(request('search') || request('filter_date'))
         <div class="mb-4 text-sm text-gray-600">
-            <span class="font-medium">{{ $sites->count() }}</span> hasil ditemukan untuk "<span class="font-medium">{{ request('search') }}</span>"
+            <span class="font-medium">{{ $sites->count() }}</span> hasil ditemukan
+            @if(request('search'))
+                untuk "<span class="font-medium">{{ request('search') }}</span>"
+            @endif
+            @if(request('filter_date'))
+                pada tanggal <span class="font-medium">{{ \Carbon\Carbon::parse(request('filter_date'))->format('d/m/Y') }}</span>
+            @endif
             <a href="{{ route('maintenance.index') }}" class="text-blue-600 hover:text-blue-800 ml-2">Tampilkan semua</a>
         </div>
     @endif
@@ -241,5 +269,28 @@
             }, 5000);
         }
     });
+
+    // Date filter functionality
+    const dateFilterInput = document.getElementById('dateFilterInput');
+    const dateFilterForm = document.getElementById('dateFilterForm');
+    let dateTimeout;
+
+    dateFilterInput.addEventListener('change', (e) => {
+        clearTimeout(dateTimeout);
+        dateTimeout = setTimeout(() => {
+            dateFilterForm.submit();
+        }, 300);
+    });
+
+    // Function to clear date filter
+    function clearDateFilter() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('filter_date');
+        if (!url.searchParams.toString()) {
+            window.location.href = url.pathname;
+        } else {
+            window.location.href = url.toString();
+        }
+    }
 </script>
 @endsection
