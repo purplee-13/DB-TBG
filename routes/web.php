@@ -46,4 +46,3 @@ Route::post('/datasite/{site}/delete', [\App\Http\Controllers\SiteController::cl
 // 🟢 UPDATE MAINTENANCE
 Route::get('/update-maintenance', [\App\Http\Controllers\MaintenanceController::class, 'index'])->name('update-maintenance');
 Route::put('/update-maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');
-Route::get('/update-maintenance', [\App\Http\Controllers\MaintenanceController::class, 'index'])->name('maintenance.index');
