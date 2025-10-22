@@ -175,6 +175,55 @@
     </div>
 </div>
 
+
+@if(session('role') == 'admin' || session('role') == 'master')
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white w-full max-w-lg rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 text-blue-600">Edit Data Site</h2>
+        <form method="POST" action="{{ route('maintenance.update', 0) }}" id="editForm">
+            @csrf
+            @method('PUT')
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Site ID</label>
+                <input type="text" id="editSiteId" class="w-full border rounded px-3 py-2" readonly>
+                <input type="hidden" id="editSiteHiddenId" name="site_id">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Site Name</label>
+                <input type="text" id="editSiteName" class="w-full border rounded px-3 py-2" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Teknisi</label>
+                <input type="text" id="editTeknisi" name="teknisi" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Tanggal Visit</label>
+                <input type="date" id="editTglVisit" name="tgl_visit" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Progres</label>
+                <select id="editProgres" name="progres" class="w-full border rounded px-3 py-2">
+                    <option value="Sudah Visit">Sudah Visit</option>
+                    <option value="Belum Visit">Belum Visit</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Operator</label>
+                <input type="text" id="editOperator" name="operator" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm font-medium">Keterangan</label>
+                <textarea id="editKeterangan" name="keterangan" rows="2" class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+            <div class="flex justify-end gap-3 mt-4">
+                <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
+
 {{-- Script --}}
 <script>
     // Elements
