@@ -12,6 +12,7 @@ class MaintenanceController extends Controller
     public function index(Request $request)
     {
         $query = Site::query();
+        $listSto = config('sto.list');
         
         // Search by site_code or site_name
         if ($request->has('search') && !empty($request->search)) {
@@ -26,11 +27,15 @@ class MaintenanceController extends Controller
         if ($request->has('filter_date') && !empty($request->filter_date)) {
             $query->whereDate('tgl_visit', $request->filter_date);
         }
+
+        if ($request->filled('sto')) {
+            $query->where('sto', $request->sto);
+        }
         
         $sites = $query->orderByRaw("CASE WHEN progres = 'Belum Visit' THEN 0 ELSE 1 END")
                       ->orderBy('site_name', 'asc')
                       ->get();
-        return view('update-maintenance', compact('sites'));
+        return view('update-maintenance', compact('sites', 'listSto'));
     }
 
     public function create()
