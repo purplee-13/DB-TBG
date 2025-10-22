@@ -12,7 +12,7 @@ class MaintenanceController extends Controller
     public function index(Request $request)
     {
         $query = Site::query();
-        $listSto = config('sto.list');
+        $listSto = config('list_sto.list');
         
         // Search by site_code or site_name
         if ($request->has('search') && !empty($request->search)) {
