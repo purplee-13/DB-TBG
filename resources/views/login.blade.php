@@ -27,9 +27,9 @@
     <!-- Left Side -->
     <div class="w-1/2 bg-cover bg-left border-8 border-white rounded-[2rem] relative bg-blend-soft-light"
          style="background-image: url('/assets/bg2.png'); background-color: rgba(0, 0, 0, 0.5);">
-        <div class="absolute bottom-20 left-10 text-white z-10">
-            <h1 class="text-2xl font-bold leading-snug">
-                Accelerating<br>Connectivity with<br>Sustainable Growth
+        <div class="absolute bottom-16 left-12 text-white z-10">
+            <h1 class="text-3xl font-bold leading-relaxed tracking-wide">
+                Dashboard Internal<br>Monitoring<br>System
             </h1>
         </div>
     </div>
@@ -37,7 +37,7 @@
     <!-- Right Side -->
     <div class="w-1/2 flex flex-col items-center justify-center px-10 text-gray-700">
       <img src="{{ asset('assets/icon/tbg.png') }}" alt="Logo" class="w-40 mb-5">
-      <p class="text-sm text-gray-500 mb-6 text-center">Silahkan login menggunakan Username & Password anda!</p>
+      <p class="text-sm text-gray-500 mb-6 text-center"> Login menggunakan Username & Password anda!</p>
       @if($errors->any())
             <div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 <ul class="list-disc list-inside">
@@ -61,7 +61,7 @@
           <input id="password" name="password" type="password" placeholder="Password"
                  class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
           <button type="button" id="togglePassword" class="absolute right-3 top-8 text-gray-400 hover:text-gray-600">
-            <span class="material-symbols-outlined">visibility</span>
+            <span class="material-symbols-outlined">visibility_off</span>
           </button>
         </div>
 
@@ -88,4 +88,3 @@
     });
 </script>
 </html>
-
