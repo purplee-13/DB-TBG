@@ -8,10 +8,10 @@ echo
 echo "Memulai ngrok untuk port 8000..."
 echo
 echo "Setelah ngrok berjalan, copy URL yang muncul"
-echo "Contoh: https://abc123.ngrok.io"
+echo "Contoh: https://abc123.ngrok-free.app"
 echo
 echo "Kemudian jalankan:"
-echo "php scripts/set-telegram-webhook.php https://abc123.ngrok.io"
+echo "php artisan telegram:set-webhook https://abc123.ngrok-free.app/api/telegram/webhook"
 echo
 
 ngrok http 8000

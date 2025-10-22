@@ -15,6 +15,7 @@ class VerifyCsrfToken extends Middleware
         // Tambahkan untuk ngrok dan development
         'telegram/*',
         'api/telegram/*',
+        'api/telegram/webhook',
     ];
 }
     

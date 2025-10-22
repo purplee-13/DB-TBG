@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Site;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class TelegramController extends Controller
 {
@@ -22,50 +23,54 @@ class TelegramController extends Controller
             return response()->json(['message' => 'No text'], 200);
         }
 
-        $text = strtoupper($data['message']['text']); // Biar tidak case-sensitive
-        Log::info('Processing text message:', ['text' => $text]);
+        $text = $data['message']['text'];
+        $chatId = $data['message']['chat']['id'];
+        
+        Log::info('Processing text message:', ['text' => $text, 'chat_id' => $chatId]);
 
-        /**
-         * Contoh format pesan:
-         * VISIT SITE123 oleh Andi, tanggal 2025-10-16
-         */
-        if (preg_match('/VISIT\s+SITE(\d+)\s+OLEH\s+([A-Z ]+),\s*TANGGAL\s*(\d{4}-\d{2}-\d{2})/i', $text, $matches)) {
-            $siteCode = 'SITE' . $matches[1];
-            $teknisi = trim($matches[2]);
-            $tglVisit = $matches[3];
-
-            Log::info('Parsed message data:', [
+        // Parsing perintah /update <site_id> <status>
+        if (preg_match('/^\/update\s+([A-Z0-9_-]+)\s+(.+)$/i', $text, $matches)) {
+            $siteCode = strtoupper(trim($matches[1]));
+            $status = trim($matches[2]);
+            
+            Log::info('Parsed update command:', [
                 'site_code' => $siteCode,
-                'teknisi' => $teknisi,
-                'tgl_visit' => $tglVisit
+                'status' => $status
             ]);
 
             $site = Site::where('site_code', $siteCode)->first();
 
             if ($site) {
+                // Update data site
                 $site->update([
-                    'progres' => 'Sudah Visit',
-                    'nama_teknisi' => $teknisi,
-                    'tgl_visit' => Carbon::parse($tglVisit)
+                    'progres' => $status,
+                    'tgl_visit' => Carbon::now()
                 ]);
 
-                Log::info('Site updated successfully', ['site_id' => $site->id]);
-                $this->sendTelegramMessage("✅ Data {$siteCode} berhasil diperbarui oleh {$teknisi}!");
+                Log::info('Site updated successfully', ['site_code' => $site->id]);
+                
+                // Kirim konfirmasi ke grup
+                $confirmMessage = "✅ *Site {$site->nama_site}* berhasil diperbarui menjadi *{$status}* pada *" . Carbon::now()->format('d-m-Y H:i') . "*.";
+                $this->sendTelegramMessage($chatId, $confirmMessage);
+                
+                // Kirim ringkasan total site
+                $this->sendSiteSummary($chatId);
+                
             } else {
                 Log::warning('Site not found', ['site_code' => $siteCode]);
-                $this->sendTelegramMessage("⚠️ Data dengan kode {$siteCode} tidak ditemukan di sistem.");
+                $this->sendTelegramMessage($chatId, "⚠️ Site dengan ID {$siteCode} tidak ditemukan di sistem.");
             }
         } else {
             Log::info('Message format not recognized', ['text' => $text]);
+            $this->sendTelegramMessage($chatId, "Format perintah tidak dikenali. Gunakan: /update <site_code> <status>");
         }
 
         return response()->json(['status' => 'ok']);
     }
 
-    private function sendTelegramMessage($text)
+    private function sendTelegramMessage($chatId, $text)
     {
         $token = env('TELEGRAM_BOT_TOKEN');
-        $chat_id = env('TELEGRAM_CHAT_ID'); // opsional: bisa kamu set jika bot hanya boleh kirim ke 1 grup
 
         if (!$token) {
             Log::error('TELEGRAM_BOT_TOKEN not found in environment');
@@ -74,16 +79,25 @@ class TelegramController extends Controller
 
         $url = "https://api.telegram.org/bot{$token}/sendMessage";
         $data = [
-            'chat_id' => $chat_id,
-            'text' => $text
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'Markdown'
         ];
 
         try {
-            $client = new \GuzzleHttp\Client();
-            $response = $client->post($url, ['form_params' => $data]);
-            Log::info('Telegram message sent successfully', ['response' => $response->getBody()]);
+            $response = Http::post($url, $data);
+            Log::info('Telegram message sent successfully', ['response' => $response->body()]);
         } catch (\Exception $e) {
             Log::error('Failed to send Telegram message', ['error' => $e->getMessage()]);
         }
+    }
+
+    private function sendSiteSummary($chatId)
+    {
+        $totalSites = Site::count();
+        $visitedSites = Site::where('progres', 'Sudah Visit')->count();
+        
+        $summaryMessage = "📊 Total site yang sudah visit: {$visitedSites} dari {$totalSites} site.";
+        $this->sendTelegramMessage($chatId, $summaryMessage);
     }
 }

@@ -48,6 +48,4 @@ Route::get('/update-maintenance', [\App\Http\Controllers\MaintenanceController::
 Route::put('/maintenance/{id}', [MaintenanceController::class, 'update'])->name('maintenance.update');
 Route::get('/maintenance', [\App\Http\Controllers\MaintenanceController::class, 'index'])->name('maintenance.index');
 
-// Route untuk webhook Telegram (untuk testing)
-Route::post('/telegram/webhook', [TelegramController::class, 'handleWebhook']);
 
