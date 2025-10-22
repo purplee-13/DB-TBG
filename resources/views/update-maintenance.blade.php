@@ -177,6 +177,101 @@
 
 {{-- Script --}}
 <script>
+    // Elements
+    const editModal = document.getElementById('editModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const editBtns = document.querySelectorAll('.edit-btn');
+
+    // Form Fields
+    const editForm = document.getElementById('editForm');
+    const siteIdField = document.getElementById('editSiteId');
+    const siteNameField = document.getElementById('editSiteName');
+    const teknisiField = document.getElementById('editTeknisi');
+    const tglField = document.getElementById('editTglVisit');
+    const progresField = document.getElementById('editProgres');
+    const operatorField = document.getElementById('editOperator');
+    const ketField = document.getElementById('editKeterangan');
+
+    // Open Modal & Fill Data (only if modal exists)
+    if (editForm && editModal && closeModalBtn) {
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update form action with correct site ID
+                editForm.action = editForm.action.replace(/\/\d+$/, '/' + btn.dataset.id);
+                
+                siteIdField.value = btn.dataset.siteCode;
+                siteNameField.value = btn.dataset.siteName;
+                teknisiField.value = btn.dataset.teknisi || '';
+                // Convert date format from dd/mm/yyyy to yyyy-mm-dd
+                if (btn.dataset.tgl) {
+                    tglField.value = btn.dataset.tgl.split('/').reverse().join('-');
+                } else {
+                    tglField.value = '';
+                }
+                progresField.value = btn.dataset.progres;
+                operatorField.value = btn.dataset.operator || '';
+                ketField.value = btn.dataset.ket || '';
+
+                editModal.classList.remove('hidden');
+                editModal.classList.add('flex');
+            });
+        });
+
+        // Close Modal
+        closeModalBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+        });
+
+        // Close modal if click outside
+        window.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.classList.add('hidden');
+            }
+        });
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchForm.submit();
+        }, 500); // Submit after 500ms of no typing
+    });
+
+    // Submit on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            searchForm.submit();
+        }
+    });
+
+    // Auto-hide success alert after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    });
+
+    // Date filter functionality
+    const dateFilterInput = document.getElementById('dateFilterInput');
+    const dateFilterForm = document.getElementById('dateFilterForm');
+    let dateTimeout;
+
+    dateFilterInput.addEventListener('change', (e) => {
+        clearTimeout(dateTimeout);
+        dateTimeout = setTimeout(() => {
+            dateFilterForm.submit();
+        }, 300);
+    });
+
     // Auto-submit STO filter
     const stoFilter = document.getElementById('stoFilter');
     const stoFilterForm = document.getElementById('stoFilterForm');
@@ -184,6 +279,15 @@
         stoFilterForm.submit();
     });
 
-    // (Script lainnya tetap seperti punyamu)
+    // Function to clear date filter
+    function clearDateFilter() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('filter_date');
+        if (!url.searchParams.toString()) {
+            window.location.href = url.pathname;
+        } else {
+            window.location.href = url.toString();
+        }
+    }
 </script>
 @endsection
