@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Site;
+use App\Models\Site;    
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -32,9 +32,20 @@ class SiteController extends Controller
 
         return redirect()->route('datasite')->with('success','Site berhasil ditambahkan.');
     }
-    public function index()
+    public function index(Request $request)
     {
-        $sites = Site::orderBy('id','desc')->get();
+        $query = Site::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('site_code', 'like', "%{$search}%")
+                ->orWhere('site_name', 'like', "%{$search}%")
+                ->orWhere('service_area', 'like', "%{$search}%");
+            });
+        }
+
+        $sites = $query->paginate(50)->appends(['search' => $request->search]);
         $data = config('sto');
         $serviceAreas = array_keys($data);
         $stosByArea = $data;
@@ -96,4 +107,5 @@ class SiteController extends Controller
         }
     }
 
+    
 }

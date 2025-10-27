@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Maintenance;
 use App\Models\Site;
+use App\Exports\SiteExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -121,5 +123,14 @@ class MaintenanceController extends Controller
     {
         $maintenance->delete();
         return redirect()->route('maintenances.index')->with('success','Maintenance berhasil dihapus.');
+    }
+
+    public function export(Request $request)
+    {
+        $search = $request->get('search');
+
+        return Excel::download(new SiteExport($search), 'data-site.xlsx');
+
+
     }
 }

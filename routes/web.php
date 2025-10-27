@@ -42,6 +42,7 @@ Route::middleware(['checkauth'])->group(function () {
     // Edit Site
     Route::get('/datasite/{site}/edit', [SiteController::class, 'edit'])->name('datasite.edit');
     Route::post('/datasite/{site}/update', [SiteController::class, 'update'])->name('datasite.update');
+    Route::get('/update-maintenance/export', [MaintenanceController::class, 'export'])->name('update-maintenance.export');
     
     // Hapus Site
     Route::post('/datasite/{site}/delete', [SiteController::class, 'destroy'])->name('datasite.delete');

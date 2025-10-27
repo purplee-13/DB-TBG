@@ -88,6 +88,11 @@
                 <input type="hidden" name="filter_date" value="{{ request('filter_date') }}">
             @endif
         </form>
+
+        <a href="{{ route('update-maintenance.export', ['search' => request('search')]) }}" 
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-1">
+            <i class="fas fa-file-export"></i> Export
+        </a>
     </div>
 
     {{-- Search Results Info --}}
