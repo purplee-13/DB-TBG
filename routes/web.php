@@ -28,7 +28,7 @@ Route::middleware(['checkauth'])->group(function () {
     
     // KELOLA PENGGUNA
     Route::resource('users', UserController::class);
-    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::put('/kelola-pengguna/{id}', [UserController::class, 'update'])->name('users.update');
     Route::get('/kelola-pengguna', [UserController::class, 'index'])->name('user.management');
     
     // DATA SITE

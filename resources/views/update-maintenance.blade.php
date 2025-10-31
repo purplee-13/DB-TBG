@@ -113,10 +113,10 @@
     @endif
 
     {{-- Table --}}
-    <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <div class="bg-white rounded-xl shadow overflow-x-auto inset-0">
         <div class="max-h-[600px] overflow-y-auto">
             <table class="min-w-full text-sm border border-gray-200">
-                <thead class="bg-blue-600 text-white sticky top-0 z-10">
+                <thead class="bg-blue-600 text-white sticky top-0 z-50">
                     <tr>
                         <th class="py-3 px-4 text-left">NO</th>
                         <th class="py-3 px-4 text-left">Site ID</th>

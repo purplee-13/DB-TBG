@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-<!-- ...existing code (navbar / header) ... -->
 
 {{-- ALERT: tampilkan di bawah navbar --}}
 @if(session('success') || session('error') || isset($alert))
@@ -127,7 +126,32 @@
             </table>
         </div>
     </div>
-    {{ $sites->links() }}
+    <div class="pagination mt-4">
+        <style>
+            .pagination .flex a,
+            .pagination .flex span {
+                background-color: #fff !important; /* Tailwind blue-600 */
+                color: #000 !important;
+                border-radius: 0.375rem !important;
+                padding: 0.5rem 0.75rem !important;
+                margin: 0 0.125rem !important;
+            }
+            .pagination .flex .active span {
+                background-color: #1e40af !important; /* Tailwind blue-800 for active */
+                color: #fff !important;
+            }
+            .pagination .flex a:hover {
+                background-color: #abadb3ff !important; /* Tailwind blue-700 */
+                color: #fff !important;
+            }
+            .pagination .flex .disabled span,
+            .pagination .flex .disabled {
+                background-color: #e5e7eb !important; /* Tailwind gray-200 */
+                color: #9ca3af !important; /* Tailwind gray-400 */
+            }
+        </style>
+        {{ $sites->links() }}
+    </div>
 
 
     {{-- =================== MODAL TAMBAH =================== --}}
@@ -226,13 +250,19 @@
 </div>
 
 <script>
-   // let sites = @json($sites);
+    let sites = @json($sites->items()); // ✅ kirim data sites ke JS
     let role = @json(session('role')); // ✅ kirim role ke JS
         // Ambil CSRF token dari meta
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     function openEditModal(siteId) {
+        console.log("Edit modal dibuka untuk ID:", siteId);
         const site = sites.find(s => s.id === siteId);
+        console.log("Data site:", site);
+        if (!site) {
+            alert("Data site tidak ditemukan!");
+            return;
+        }
         if (!site) return;
         document.getElementById('editSiteID').value = site.site_code;
         document.getElementById('editSiteName').value = site.site_name;
@@ -410,7 +440,7 @@
                 }
             });
         }
-    }
+    
 
     // Initial render
     //renderTable(sites);
