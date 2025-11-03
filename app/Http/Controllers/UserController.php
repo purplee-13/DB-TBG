@@ -66,7 +66,7 @@ class UserController extends Controller
             'role' => strtolower($request->role)
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
+        return redirect()->route('user.management')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     // Tampilkan form edit
@@ -120,6 +120,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('user.management')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

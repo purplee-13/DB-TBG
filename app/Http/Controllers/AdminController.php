@@ -75,6 +75,7 @@ class AdminController extends Controller
             ->get();
 
         // Hitung persentase & keterangan di controller
+        
         $summary = $summaryRaw->map(function ($item) {
             $grandTotal = (int) $item->total;
             $visited = (int) $item->visited_fo + (int) $item->visited_mmp;
@@ -84,7 +85,7 @@ class AdminController extends Controller
             if ($percent == 100) {
                 $status = 'Achieved';
             } elseif ($percent >= 0 && $percent <= 1) {
-                $status = 'Belum Terassign';
+                $status = '-';
             } elseif ($percent > 1 && $percent < 100) {
                 $status = 'Progressing';
             } else {

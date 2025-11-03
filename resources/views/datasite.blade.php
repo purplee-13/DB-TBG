@@ -1,36 +1,53 @@
-{{-- Notifikasi Sukses dan Gagal --}}
-@if (session('success'))
-    <div id="notif-success" class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
-        {{ session('success') }}
-    </div>
-@endif
-@if ($errors->any())
-    <div id="notif-error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg border border-red-300">
-        <ul class="list-disc pl-5">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
 @extends('layouts.admin')
 
 @section('content')
+
+{{-- ALERT: tampilkan di bawah navbar --}}
+@if(session('success') || session('error') || isset($alert))
+    @php
+        $msg = session('success') ?? session('error') ?? $alert;
+        $isError = session('error') ? true : false;
+    @endphp
+    <div id="success-alert" class="mb-4 px-4 py-3 rounded {{ $isError ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300' }}">
+        {{ $msg }}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const alertEl = document.getElementById('success-alert');
+            if (alertEl) {
+                setTimeout(() => {
+                    alertEl.style.transition = 'opacity 400ms';
+                    alertEl.style.opacity = '0';
+                    setTimeout(() => alertEl.remove(), 500);
+                }, 5000); // 5 detik
+            }
+        });
+    </script>
+@endif
+
 <div class="p-6">
 
     {{-- =================== SEARCH & ADD =================== --}}
     <div class="flex justify-end items-center mb-4 gap-3">
-        <div class="relative">
-            <input type="text" id="searchInput" placeholder="Cari Site ID / Name / Area"
-                class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300" oninput="searchSiteId()">
-            <span class="absolute left-3 top-2.5 text-gray-500">
-                <i class="fas fa-search"></i>
-            </span>
-            <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
+        <form method="GET" action="{{ route('datasite') }}" class="flex items-center gap-2">
+            <div class="relative">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Site ID / Name / Area"
+                    class="border rounded-full pl-10 pr-10 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                <span class="absolute left-3 top-2.5 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </span>
+                @if(request('search'))
+                    <a href="{{ route('datasite') }}" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </a>
+                @endif
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Cari
             </button>
-        </div>
+        </form>
+
 
         {{-- Tombol Tambah hanya muncul untuk admin dan master --}}
         @if(session('role') === 'admin' || session('role') === 'master')
@@ -43,6 +60,19 @@
            
         @endif
     </div>
+
+    {{-- Search Results Info (client-side) --}}
+    <!-- <div id="searchInfo" class="mb-4 text-sm text-gray-600 hidden">
+        <span class="font-medium" id="searchCount">0</span> hasil ditemukan untuk "<span class="font-medium" id="searchQuery"></span>"
+        <button type="button" onclick="clearSearch()" class="text-blue-600 hover:text-blue-800 ml-2">Tampilkan semua</button>
+    </div> -->
+    @if(request('search'))
+        <div class="text-sm text-gray-600 mb-3">
+            Menampilkan hasil pencarian untuk: 
+            <span class="font-semibold text-blue-600">"{{ request('search') }}"</span>
+        </div>
+    @endif
+
 
     {{-- =================== TABLE =================== --}}
     <div class="bg-white rounded-xl shadow overflow-x-auto">
@@ -67,7 +97,7 @@
                 <tbody id="tableBody" class="divide-y">
                     @foreach ($sites as $index => $site)
                     <tr>
-                        <td class="py-2 px-4">{{ $index + 1 }}</td>
+                        <td class="py-2 px-4">{{ $sites->firstItem() + $index }}</td>
                         <td class="py-2 px-4">{{ $site->site_code }}</td>
                         <td class="py-2 px-4">{{ $site->site_name }}</td>
                         <td class="py-2 px-4">{{ $site->service_area }}</td>
@@ -95,6 +125,32 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="pagination mt-4">
+        <style>
+            .pagination .flex a,
+            .pagination .flex span {
+                background-color: #fff !important; /* Tailwind blue-600 */
+                color: #000 !important;
+                border-radius: 0.375rem !important;
+                padding: 0.5rem 0.75rem !important;
+                margin: 0 0.125rem !important;
+            }
+            .pagination .flex .active span {
+                background-color: #1e40af !important; /* Tailwind blue-800 for active */
+                color: #fff !important;
+            }
+            .pagination .flex a:hover {
+                background-color: #abadb3ff !important; /* Tailwind blue-700 */
+                color: #fff !important;
+            }
+            .pagination .flex .disabled span,
+            .pagination .flex .disabled {
+                background-color: #e5e7eb !important; /* Tailwind gray-200 */
+                color: #9ca3af !important; /* Tailwind gray-400 */
+            }
+        </style>
+        {{ $sites->links() }}
     </div>
 
 
@@ -194,13 +250,19 @@
 </div>
 
 <script>
-    let sites = @json($sites);
+    let sites = @json($sites->items()); // ✅ kirim data sites ke JS
     let role = @json(session('role')); // ✅ kirim role ke JS
         // Ambil CSRF token dari meta
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     function openEditModal(siteId) {
+        console.log("Edit modal dibuka untuk ID:", siteId);
         const site = sites.find(s => s.id === siteId);
+        console.log("Data site:", site);
+        if (!site) {
+            alert("Data site tidak ditemukan!");
+            return;
+        }
         if (!site) return;
         document.getElementById('editSiteID').value = site.site_code;
         document.getElementById('editSiteName').value = site.site_name;
@@ -251,56 +313,68 @@
         modal.classList.remove('flex');
     }
 
-    function searchSiteId() {
-        const input = document.getElementById('searchInput').value.trim().toLowerCase();
-        if (input === "") {
-            renderTable(sites);
-            return;
-        }
-        const filtered = sites.filter(site => {
-            return String(site.site_code).toLowerCase().includes(input)
-                || String(site.site_name).toLowerCase().includes(input)
-                || String(site.service_area).toLowerCase().includes(input);
-        });
-        renderTable(filtered);
-    }
+    // function searchSiteId() {
+    //     const input = document.getElementById('searchInput').value.trim().toLowerCase();
+    //     if (input === "") {
+    //         renderTable(sites);
+    //         // hide search info when query empty
+    //         const info = document.getElementById('searchInfo');
+    //         if (info) info.classList.add('hidden');
+    //         return;
+    //     }
+    //     const filtered = sites.filter(site => {
+    //         return String(site.site_code).toLowerCase().includes(input)
+    //             || String(site.site_name).toLowerCase().includes(input)
+    //             || String(site.service_area).toLowerCase().includes(input);
+    //     });
+    //     renderTable(filtered);
+    //     // show search info with count and query
+    //     const info = document.getElementById('searchInfo');
+    //     const countEl = document.getElementById('searchCount');
+    //     const queryEl = document.getElementById('searchQuery');
+    //     if (info && countEl && queryEl) {
+    //         countEl.textContent = String(filtered.length);
+    //         queryEl.textContent = document.getElementById('searchInput').value.trim();
+    //         info.classList.remove('hidden');
+    //     }
+    // }
 
     // Render table (dengan checkbox dan aksi dinamis)
-    function renderTable(data) {
-        const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = "";
-        data.forEach((site, index) => {
-            let row = `
-                <tr>
-                    <td class='py-2 px-4 text-sm'>${index + 1}</td>
-                    <td class='py-2 px-4 text-sm'>${site.site_code}</td>
-                    <td class='py-2 px-4 text-sm'>${site.site_name}</td>
-                    <td class='py-2 px-4 text-sm'>${site.service_area}</td>
-                    <td class='py-2 px-4 text-sm'>${site.sto}</td>
-                    <td class='py-2 px-4 text-sm'>${site.product}</td>
-                    <td class='py-2 px-4 text-sm'>${site.tikor ?? ''}</td>
-            `;
+    // function renderTable(data) {
+    //     const tableBody = document.getElementById('tableBody');
+    //     tableBody.innerHTML = "";
+    //     data.forEach((site, index) => {
+    //         let row = `
+    //             <tr>
+    //                 <td class='py-2 px-4 text-sm'>${index + 1}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.site_code}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.site_name}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.service_area}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.sto}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.product}</td>
+    //                 <td class='py-2 px-4 text-sm'>${site.tikor ?? ''}</td>
+    //         `;
 
-            if (role === 'admin' || role === 'master') {
-                row += `
-                    <td class='py-2 px-4 text-center flex justify-center gap-3'>
-                        <button class='text-blue-600 hover:text-blue-800' title='Edit' onclick='openEditModal(${site.id})'>
-                            <i class='fas fa-pen'></i>
-                        </button>
-                        <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                            <input type='hidden' name='_token' value='${csrfToken}'>
-                            <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
-                                <i class='fas fa-trash'></i>
-                            </button>
-                        </form>
-                    </td>
-                    <td class='py-2 px-4 text-center'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
-                `;
-            }
+    //         if (role === 'admin' || role === 'master') {
+    //             row += `
+    //                 <td class='py-2 px-4 text-center flex justify-center gap-3'>
+    //                     <button class='text-blue-600 hover:text-blue-800' title='Edit' onclick='openEditModal(${site.id})'>
+    //                         <i class='fas fa-pen'></i>
+    //                     </button>
+    //                     <form method='POST' action='/datasite/${site.id}/delete' style='display:inline;' onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+    //                         <input type='hidden' name='_token' value='${csrfToken}'>
+    //                         <button type='submit' class='text-red-600 hover:text-red-800' title='Hapus'>
+    //                             <i class='fas fa-trash'></i>
+    //                         </button>
+    //                     </form>
+    //                 </td>
+    //                 <td class='py-2 px-4 text-center'><input type='checkbox' class='row-checkbox' value='${site.id}'></td>
+    //             `;
+    //         }
 
-            row += `</tr>`;
-            tableBody.innerHTML += row;
-        });
+    //         row += `</tr>`;
+    //         tableBody.innerHTML += row;
+    //     });
 
         // Setup selectAll checkbox (yang sekarang ada di thead sebagai #selectAllCheckbox)
         const selectAllInput = document.getElementById('selectAllCheckbox');
@@ -366,14 +440,16 @@
                 }
             });
         }
-    }
+    
 
     // Initial render
-    renderTable(sites);
+    //renderTable(sites);
 
     function clearSearch() {
         document.getElementById('searchInput').value = "";
         renderTable(sites);
+        const info = document.getElementById('searchInfo');
+        if (info) info.classList.add('hidden');
     }
 
     // Auto-hide notifikasi

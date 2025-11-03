@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-6">
 
-    {{-- 🔔 Notifikasi Sukses --}}
+    {{-- 📢 Notifikasi Sukses --}}
     @if (session('success'))
         <div id="notif-success"
             class="mb-4 p-3 bg-green-100 text-green-800 rounded-lg border border-green-300">
@@ -56,7 +56,7 @@
                         <td class="py-2 px-4">{{ $no++ }}</td>
                         <td class="py-2 px-4">{{ $u->name }}</td>
                         <td class="py-2 px-4">{{ $u->username }}</td>
-                        <td class="py-2 px-4">{{ $u->role }}</td>
+                        <td class="py-2 px-4">{{ ucfirst($u->role) }}</td>
                         <td class="py-2 px-4 text-center">
                             <button onclick="openEditModal({{ $u->id }}, '{{ $u->name }}', '{{ $u->username }}', '{{ $u->role }}')"
                                 class="text-blue-600 hover:text-blue-800 mr-3" title="Edit">
@@ -82,32 +82,51 @@
         class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
             <h2 class="text-xl font-bold mb-4">Tambah Pengguna</h2>
-            <form action="{{ route('users.store') }}" method="POST">
+            <form action="{{ route('users.store') }}" method="POST" autocomplete="off">
                 @csrf
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Nama Pengguna</label>
-                    <input type="text" name="name" value="{{ old('name') }}"
-                        placeholder="Masukkan nama"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" 
+                           name="name" 
+                           id="addName"
+                           value=""
+                           placeholder="Masukkan nama lengkap"
+                           autocomplete="off"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Username</label>
-                    <input type="text" name="username" value="{{ old('username') }}"
-                        placeholder="Masukkan username"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" 
+                           name="username" 
+                           id="addUsername"
+                           value=""
+                           placeholder="Masukkan username"
+                           autocomplete="off"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Password</label>
-                    <input type="password" name="password" placeholder="Masukkan password"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="password" 
+                           name="password" 
+                           id="addPassword"
+                           value=""
+                           placeholder="Min. 8 karakter (huruf besar, kecil, angka, spesial)"
+                           autocomplete="new-password"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                           required>
+                    <small class="text-gray-500 text-xs">Contoh: Password@123</small>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Role</label>
                     <select name="role"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                            id="addRole"
+                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                            required>
                         <option value="">Pilih Role</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="pegawai" {{ old('role') == 'pegawai' ? 'selected' : '' }}>Pegawai</option>
+                        <option value="admin">Admin</option>
+                        <option value="pegawai">Pegawai</option>
                     </select>
                 </div>
 
@@ -126,28 +145,44 @@
         class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
             <h2 class="text-xl font-bold mb-4">Edit Pengguna</h2>
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" autocomplete="off">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Nama Pengguna</label>
-                    <input type="text" id="editName" name="name"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" 
+                           id="editName" 
+                           name="name"
+                           autocomplete="off"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Username</label>
-                    <input type="text" id="editUsername" name="username"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="text" 
+                           id="editUsername" 
+                           name="username"
+                           autocomplete="off"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Password (biarkan kosong jika tidak diubah)</label>
-                    <input type="password" name="password"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <input type="password" 
+                           id="editPassword"
+                           name="password"
+                           value=""
+                           placeholder="Kosongkan jika tidak ingin mengubah password"
+                           autocomplete="new-password"
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <small class="text-gray-500 text-xs">Min. 8 karakter (huruf besar, kecil, angka, spesial)</small>
                 </div>
                 <div class="mb-3">
                     <label class="block text-sm font-medium">Role</label>
-                    <select id="editRole" name="role"
-                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                    <select id="editRole" 
+                            name="role"
+                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                            required>
                         <option value="admin">Admin</option>
                         <option value="pegawai">Pegawai</option>
                     </select>
@@ -168,13 +203,32 @@
 {{-- Script untuk Modal --}}
 <script>
     function openModal() {
-        document.getElementById('addModal').classList.remove('hidden');
-        document.getElementById('addModal').classList.add('flex');
+        const modal = document.getElementById('addModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // 🔥 RESET SEMUA INPUT FIELD KE KOSONG
+        document.getElementById('addName').value = '';
+        document.getElementById('addUsername').value = '';
+        document.getElementById('addPassword').value = '';
+        document.getElementById('addRole').value = '';
+        
+        // Focus ke input pertama
+        setTimeout(() => {
+            document.getElementById('addName').focus();
+        }, 100);
     }
 
     function closeModal() {
-        document.getElementById('addModal').classList.remove('flex');
-        document.getElementById('addModal').classList.add('hidden');
+        const modal = document.getElementById('addModal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        
+        // Reset form saat ditutup
+        document.getElementById('addName').value = '';
+        document.getElementById('addUsername').value = '';
+        document.getElementById('addPassword').value = '';
+        document.getElementById('addRole').value = '';
     }
 
     function openEditModal(id, name, username, role) {
@@ -184,22 +238,72 @@
 
         document.getElementById('editName').value = name;
         document.getElementById('editUsername').value = username;
+        
+        // 🔥 PASTIKAN PASSWORD SELALU KOSONG SAAT EDIT
+        document.getElementById('editPassword').value = '';
 
-        // role from DB may be 'Admin' or 'admin' - normalize to lowercase to match option values
+        // Normalize role to lowercase
         if (role && typeof role === 'string') {
             try { role = role.toLowerCase(); } catch (e) {}
         }
         document.getElementById('editRole').value = role || '';
 
         const form = document.getElementById('editForm');
-        // Use server-generated base URL to support subfolder deployments
         const usersBase = "{{ url('users') }}";
         form.action = usersBase + '/' + id;
+        
+        // Focus ke input pertama
+        setTimeout(() => {
+            document.getElementById('editName').focus();
+        }, 100);
     }
 
     function closeEditModal() {
-        document.getElementById('editModal').classList.remove('flex');
-        document.getElementById('editModal').classList.add('hidden');
+        const modal = document.getElementById('editModal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        
+        // Reset password field
+        document.getElementById('editPassword').value = '';
     }
+
+    // 🔥 PREVENT AUTOFILL SAAT HALAMAN LOAD
+    window.addEventListener('load', function() {
+        // Disable autofill untuk semua input password dan username
+        const inputs = document.querySelectorAll('input[type="password"], input[name="username"], input[name="name"]');
+        inputs.forEach(input => {
+            input.setAttribute('autocomplete', 'off');
+            input.value = '';
+        });
+    });
+
+    // 🔥 CLEAR FIELDS SAAT MODAL PERTAMA KALI MUNCUL
+    document.addEventListener('DOMContentLoaded', function() {
+        // Clear add modal fields
+        const addModal = document.getElementById('addModal');
+        const editModal = document.getElementById('editModal');
+        
+        // Observer untuk detect kapan modal muncul
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    if (!addModal.classList.contains('hidden')) {
+                        // Clear semua field di add modal
+                        document.getElementById('addName').value = '';
+                        document.getElementById('addUsername').value = '';
+                        document.getElementById('addPassword').value = '';
+                        document.getElementById('addRole').value = '';
+                    }
+                    if (!editModal.classList.contains('hidden')) {
+                        // Clear password di edit modal
+                        document.getElementById('editPassword').value = '';
+                    }
+                }
+            });
+        });
+        
+        observer.observe(addModal, { attributes: true });
+        observer.observe(editModal, { attributes: true });
+    });
 </script>
 @endsection
